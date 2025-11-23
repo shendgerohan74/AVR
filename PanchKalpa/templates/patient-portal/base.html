@@ -26,15 +26,15 @@
 
         <!-- 2. Navigation Links -->
         <div class="dashboard-nav-links-group">
-            <a href="{% url 'patient-dashboard' %}" class="dashboard-nav-item-button active"><i class="fa-brands fa-dashcube"></i>
+            <a href="{% url 'patient-dashboard' %}" class="dashboard-nav-item-button {% block dashboard %}{% endblock dashboard %}"><i class="fa-brands fa-dashcube"></i>
                 Dashboard</a>
-            <a href="{% url 'patient-appointments' %}" class="dashboard-nav-item-button"><i class="fa-solid fa-video"></i>
+            <a href="{% url 'patient-appointments' %}" class="dashboard-nav-item-button {% block appointments %}{% endblock appointments %}"><i class="fa-solid fa-video"></i>
                 Appointments</a>
-            <a href="{% url 'patient-progress' %}" class="dashboard-nav-item-button"><i class="fa-regular fa-calendar-check"></i>
+            <a href="{% url 'patient-progress' %}" class="dashboard-nav-item-button {% block progress %}{% endblock progress %}"><i class="fa-regular fa-calendar-check"></i>
                 Progress</a>
-            <a href="{% url 'patient-billing' %}" class="dashboard-nav-item-button"><i class="fa-solid fa-file-invoice"></i>
+            <a href="{% url 'patient-billing' %}" class="dashboard-nav-item-button {% block billing %}{% endblock billing %}"><i class="fa-solid fa-file-invoice"></i>
                 Billing</a>
-            <a href="{% url 'patient-teleconsult' %}" class="dashboard-nav-item-button"><i class="fa-solid fa-headset"></i>
+            <a href="{% url 'patient-teleconsult' %}" class="dashboard-nav-item-button {% block teleconsult %}{% endblock teleconsult %}"><i class="fa-solid fa-headset"></i>
                 Tele-Consult</a>
 
         </div>
@@ -73,16 +73,11 @@
 
                 <!-- Name -->
                 <div class="dashboard-profile-name-text">
-                    {{ request.user.first_name|default:"Aniket" }}
+                    {{ request.user.first_name|default:"User" }}
                 </div>
         </div>
 
-
-        <!-- Logout -->
-        <button class="dashboard-logout-action" title="Logout">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            Log out
-        </button>
+        
         </div>
     </nav>
     {% block content %}{% endblock content %}

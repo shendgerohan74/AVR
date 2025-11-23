@@ -1,6 +1,8 @@
 {% extends "patient-portal/base.html" %}
 {% load static %}
 
+{% block dashboard %}active{% endblock dashboard %}
+
 {% block title %}Patient Dashboard{% endblock title %}
 
 {% block style %}
@@ -100,15 +102,15 @@
                         <i class="far fa-calendar-plus"></i>
                         <span>Book Appointment</span>
                     </a>
-                    <a href="#" class="dashboard-action-button">
+                    <a href="{% url "patient-progress" %}" class="dashboard-action-button">
                         <i class="fas fa-tasks"></i>
                         <span>View Progress</span>
                     </a>
-                    <a href="#" class="dashboard-action-button">
+                    <a href="{% url "patient-billing" %}" class="dashboard-action-button">
                         <i class="fas fa-file-invoice-dollar"></i>
                         <span>Pay Bills</span>
                     </a>
-                    <a href="#" class="dashboard-action-button">
+                    <a href="{% url "patient-teleconsult" %}" class="dashboard-action-button">
                         <i class="fas fa-video"></i>
                         <span>Online Consultation</span>
                     </a>

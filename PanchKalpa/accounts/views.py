@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib import messages
@@ -11,6 +11,11 @@ from Patient.models import PatientProfile
 def landing_page(request):
     return render(request, 'landing.html')
 
+# LOGOUT VIEW
+def logout_view(request):
+    logout(request)
+    messages.success(request, "You have succesfully logged out See you Again Soon ....!!!!")
+    return redirect("/")
 
 #  SIGNUP PAGE 
 def signup_view(request):

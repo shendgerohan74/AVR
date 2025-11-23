@@ -116,6 +116,7 @@ h5 {
 .dashboard-nav-profile-section {
     display: flex;
     align-items: center;
+    margin-right: 3vw;
     gap: 15px;
 }
 
