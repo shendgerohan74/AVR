@@ -1,0 +1,332 @@
+
+        /* --- 1. Shared Color Palette --- */
+        :root {
+            --gold: #FFD700;
+            --gold-dark: #C8A300;
+            --cream: #FFF8E6;
+            --brown: #78350f;
+            --bg-light: #fff7e5;
+            --text-dark: #2A241F;
+            --muted: #6b5f5a;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(120, 53, 15, 0.08);
+            --radius: 12px;
+        }
+
+        /* --- 2. Global Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            font-family: 'Lato', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Playfair Display', serif;
+            color: var(--brown);
+        }
+
+        /* === NAVBAR === */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 40px;
+            align-items: center;
+            background: var(--brown);
+            border-bottom: 1px solid rgba(120, 53, 15, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            z-index: 200;
+        }
+
+        .logo {
+            height: 50px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 140px;
+            width: auto;
+            object-fit: contain;
+            margin-top: -5px;
+            z-index: 1000;
+        }
+
+        /* === LOGIN CONTAINER === */
+        .login-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 550px;
+            background: var(--white);
+            padding: 35px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .login-box:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold);
+        }
+
+        .title {
+            text-align: center;
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        /* SWITCHER TABS */
+        .switcher {
+            display: flex;
+            background: var(--cream);
+            border: 1px solid var(--gold);
+            border-radius: 25px;
+            padding: 4px;
+            margin-bottom: 25px;
+        }
+
+        .switcher button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            color: var(--muted);
+            transition: all 0.3s;
+        }
+
+        .switcher button.active {
+            background: var(--brown);
+            color: var(--gold);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* FORMS */
+        .form {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .active-form {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            display: block;
+            margin-bottom: 6px;
+            margin-top: 15px;
+        }
+
+        label:first-child {
+            margin-top: 0;
+        }
+
+        input {
+            margin: 5px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background-color: #fffcf5;
+            font-family: 'Lato', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            transition: all 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+            background-color: var(--white);
+        }
+
+        /* DYNAMIC FIELDS SECTION */
+        .additional-fields {
+            display: none;
+            border-top: 1px dashed var(--gold-dark);
+            margin-top: 20px;
+            padding-top: 10px;
+            animation: slideDown 0.5s ease forwards;
+            background-color: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+                max-height: 0;
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                max-height: 1200px;
+            }
+        }
+
+        .field-group-title {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            color: var(--brown);
+        }
+
+        .file-upload-wrapper input[type=file] {
+            font-size: 0.85rem;
+            background: white;
+            padding: 8px;
+            width: 100%;
+        }
+
+        /* Checkbox Grid for Therapies */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            padding: 8px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 6px;
+        }
+
+        .checkbox-item input {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        /* Two Column Utility */
+        .form-row {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 5px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        /* MAIN BUTTON */
+        .main-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 25px;
+            background: var(--brown);
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-btn:hover {
+            background: #5a270b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(120, 53, 15, 0.2);
+        }
+
+        .main-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .main-btn:hover::before {
+            left: 100%;
+        }
+
+        /* HELPER LINKS */
+        .help-recover {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .for-pass a {
+            text-decoration: none;
+            color: var(--muted);
+            transition: color 0.2s;
+        }
+
+        .for-pass a:hover {
+            color: var(--brown);
+            text-decoration: underline;
+        }

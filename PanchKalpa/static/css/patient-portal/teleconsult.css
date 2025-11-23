@@ -1,0 +1,427 @@
+/* --- 1. GLOBAL THEME VARIABLES --- */
+:root {
+    --theme-gold: #FFD700;
+    --theme-gold-dark: #C8A300;
+    --theme-cream: #FFF8E6;
+    --theme-brown: #78350f;
+    --theme-bg-light: #fff7e5;
+    --theme-text-dark: #2A241F;
+    --theme-muted: #6b5f5a;
+    --theme-white: #ffffff;
+    --theme-shadow: 0 4px 15px rgba(120, 53, 15, 0.08);
+    --theme-radius: 12px;
+    --theme-nav-height: 80px;
+
+    /* Video Specific Colors */
+    --video-bg: #1a1a1a;
+    --chat-bg: #f9f9f9;
+    --msg-sent: #E3F2FD;
+    --msg-received: #ffffff;
+}
+
+/* --- 2. BASE LAYOUT --- */
+body {
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    background-color: var(--theme-bg-light);
+    color: var(--theme-text-dark);
+    padding-top: var(--theme-nav-height);
+    height: 100vh;
+    overflow: hidden;
+    /* Prevent scrolling on video page */
+}
+
+/* --- 3. NAVBAR (Consistent) --- */
+.dashboard-navbar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--theme-nav-height);
+    background: var(--theme-brown);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-logo-wrapper img {
+    height: 100px;
+    margin-top: 10px;
+    object-fit: contain;
+}
+
+.dashboard-nav-links-group {
+    display: flex;
+    gap: 10px;
+}
+
+.dashboard-nav-item-button {
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+
+.dashboard-nav-item-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--theme-gold);
+}
+
+.dashboard-nav-item-button.active {
+    background: var(--theme-gold);
+    color: var(--theme-brown);
+    font-weight: 700;
+}
+
+.dashboard-nav-item-button.active i {
+    color: var(--theme-brown);
+}
+
+.dashboard-nav-item-button i {
+    color: var(--theme-gold);
+}
+
+.dashboard-nav-profile-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dashboard-profile-summary-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 6px 15px 6px 6px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.dashboard-profile-summary-pill:hover {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: var(--theme-gold);
+}
+
+.dashboard-profile-icon-circle {
+    width: 32px;
+    height: 32px;
+    background: var(--theme-gold);
+    color: var(--theme-brown);
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Playfair Display', serif;
+}
+
+.dashboard-profile-name-text {
+    font-size: 0.9rem;
+    color: white;
+    font-weight: 600;
+}
+
+.dashboard-logout-action {
+    color: rgba(255, 255, 255, 0.6);
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+/* --- 4. VIDEO LAYOUT GRID --- */
+.video-main-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    /* Video takes remaining space, Sidebar fixed 350px */
+    height: calc(100vh - var(--theme-nav-height));
+    background-color: #000;
+    /* Dark bg for cinema feel */
+}
+
+/* LEFT: VIDEO AREA */
+.video-stream-section {
+    position: relative;
+    background-color: var(--video-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Placeholder for Remote Video */
+.video-remote-feed {
+    width: 100%;
+    height: 100%;
+    max-height: 85vh;
+    background-color: #222;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    font-family: 'Lato', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.video-remote-feed img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+}
+
+.video-status-text {
+    position: absolute;
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 20px;
+}
+
+/* Local User Pip (Picture in Picture) */
+.video-local-pip {
+    position: absolute;
+    bottom: 100px;
+    right: 40px;
+    width: 180px;
+    height: 120px;
+    background-color: #333;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    z-index: 20;
+}
+
+/* Local Video Element (Added) */
+#localVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    /* Hidden until active */
+    transform: scaleX(-1);
+    /* Mirror effect */
+}
+
+#localVideoPlaceholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Controls Bar */
+.video-controls-bar {
+    position: absolute;
+    bottom: 30px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    border-radius: 40px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 20;
+}
+
+.video-control-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.video-control-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+
+.btn-end-call {
+    background: #d32f2f;
+    color: white;
+}
+
+.btn-end-call:hover {
+    background: #b71c1c;
+}
+
+.btn-start-call {
+    background: var(--theme-green-text, #2E7D32);
+    width: auto;
+    padding: 0 25px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Lato';
+}
+
+/* RIGHT: SIDEBAR (Chat + Info) */
+.video-sidebar {
+    background-color: var(--theme-white);
+    border-left: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Patient Info Header */
+.sidebar-info-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    background: var(--theme-bg-light);
+}
+
+.patient-info-title {
+    font-family: 'Playfair Display';
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--theme-brown);
+}
+
+.patient-info-sub {
+    font-size: 0.85rem;
+    color: var(--theme-muted);
+    margin-top: 4px;
+}
+
+/* Chat Area */
+.sidebar-chat-area {
+    flex-grow: 1;
+    background-color: var(--chat-bg);
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    position: relative;
+}
+
+.msg-received {
+    align-self: flex-start;
+    background: var(--msg-received);
+    border: 1px solid #eee;
+    border-bottom-left-radius: 2px;
+}
+
+.msg-sent {
+    align-self: flex-end;
+    background: var(--theme-brown);
+    color: var(--theme-gold);
+    border-bottom-right-radius: 2px;
+}
+
+.msg-time {
+    font-size: 0.65rem;
+    opacity: 0.7;
+    display: block;
+    margin-top: 4px;
+    text-align: right;
+}
+
+/* Chat Input */
+.sidebar-input-area {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.chat-input-field {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-family: 'Lato';
+}
+
+.chat-input-field:focus {
+    border-color: var(--theme-gold);
+}
+
+.chat-action-btn {
+    background: none;
+    border: none;
+    color: var(--theme-brown);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.chat-action-btn:hover {
+    color: var(--theme-gold-dark);
+}
+
+/* Download Section */
+.sidebar-download-section {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.btn-download-presc {
+    width: 100%;
+    padding: 10px;
+    background: var(--theme-white);
+    border: 1px solid var(--theme-brown);
+    color: var(--theme-brown);
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.btn-download-presc:hover {
+    background: var(--theme-bg-light);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+    .video-main-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 300px;
+    }
+
+    .video-local-pip {
+        width: 100px;
+        height: 70px;
+        bottom: 80px;
+        right: 20px;
+    }
+}

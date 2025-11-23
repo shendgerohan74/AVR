@@ -1,0 +1,385 @@
+/* --- 1. Shared Color Palette --- */
+:root {
+    --gold: #FFD700;
+    --gold-dark: #C8A300;
+    --cream: #FFF8E6;
+    --brown: #78350f;
+    --bg-light: #fff7e5;
+    --text-dark: #2A241F;
+    --muted: #6b5f5a;
+    --white: #ffffff;
+    --shadow: 0 4px 15px rgba(120, 53, 15, 0.08);
+    --radius: 12px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    /* DEFAULT STATE: Sidebar is hidden, so 0 margin */
+    margin-left: 0;
+    transition: margin-left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow-x: hidden;
+}
+
+/* --- ACTIVE STATE (JS Toggles This) --- */
+body.sidebar-active {
+    margin-left: 260px;
+    /* Push content when sidebar opens */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Playfair Display', serif;
+    color: var(--brown);
+}
+
+/* --- 2. Sidebar Styling --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    background: var(--brown);
+    border-right: 1px solid rgba(200, 163, 0, 0.2);
+    padding: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    /* DEFAULT STATE: Hidden off-screen */
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Sidebar Visible State */
+body.sidebar-active .sidebar {
+    transform: translateX(0);
+}
+
+.logo {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.logo img {
+    height: 120px;
+    object-fit: contain;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.nav-item {
+    margin-bottom: 10px;
+}
+
+.nav-item a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-family: 'Lato', sans-serif;
+}
+
+.nav-item a:hover,
+.nav-item a.active {
+    background: rgba(255, 215, 0, 0.15);
+    color: var(--gold);
+    transform: translateX(5px);
+}
+
+/* --- TOGGLE BUTTON --- */
+.sidebar-toggle-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    /* Default position when sidebar is closed */
+    z-index: 1050;
+    background: var(--gold);
+    color: var(--brown);
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle-btn:hover {
+    transform: scale(1.1);
+    background: #ffe066;
+}
+
+/* Move button when sidebar is open */
+body.sidebar-active .sidebar-toggle-btn {
+    left: 280px;
+    /* 260px sidebar width + 20px gap */
+}
+
+/* --- 3. Button Styling --- */
+.btn-cta {
+    background: var(--brown);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-family: 'Lato', sans-serif;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-cta:hover {
+    background: #5a270b;
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(120, 53, 15, 0.3);
+}
+
+.btn-cta::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+    transition: 0.5s;
+}
+
+.btn-cta:hover::before {
+    left: 100%;
+}
+
+.btn-outline-custom {
+    border: 1px solid var(--white);
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-outline-custom:hover {
+    background: var(--white);
+    color: var(--brown);
+}
+
+/* --- 4. Hero Section --- */
+.hero {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    background: url('https://images.unsplash.com/photo-1600618528240-fb9fc964b853?q=80&w=2070&auto=format&fit=crop') center/cover;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(42, 36, 31, 0.95), rgba(42, 36, 31, 0.4));
+}
+
+.hero-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 4rem 2rem;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    color: var(--white);
+    margin-bottom: 1.5rem;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+}
+
+/* --- 5. Components --- */
+section {
+    padding: 5rem 0;
+}
+
+.section-head {
+    margin-bottom: 3rem;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.feature-card {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    height: 100%;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    transition: transform 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold);
+}
+
+.card-therapy {
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.3s;
+    background: var(--white);
+    height: 100%;
+}
+
+.card-therapy:hover {
+    transform: translateY(-5px);
+}
+
+.card-therapy img {
+    height: 220px;
+    object-fit: cover;
+}
+
+/* --- 6. Contact --- */
+.contact-card {
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.form-control {
+    background-color: #fffcf5;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Lato', sans-serif;
+}
+
+.form-control:focus {
+    background-color: var(--white);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+}
+
+/* --- 7. Footer --- */
+footer {
+    background: #1a1512;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 4rem 0 2rem;
+}
+
+footer h5,
+footer h6 {
+    color: var(--white);
+}
+
+footer a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+footer a:hover {
+    color: var(--gold);
+}
+
+/* --- 8. Responsive --- */
+@media (max-width: 992px) {
+    body {
+        margin-left: 0;
+        padding-top: 80px;
+    }
+
+    /* Hide the slider button on mobile as sidebar changes layout */
+    .sidebar-toggle-btn {
+        display: none;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: 80px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+        border-right: none;
+        border-bottom: 1px solid rgba(200, 163, 0, 0.2);
+        /* Reset transformation for mobile header style */
+        transform: translateX(0);
+        position: fixed;
+        top: 0;
+    }
+
+    .logo {
+        height: 50px;
+        margin-bottom: 0;
+    }
+
+    .logo img {
+        height: 100px;
+    }
+
+    .sidebar ul {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 0;
+    }
+
+    .nav-item {
+        margin-bottom: 0;
+    }
+
+    .nav-item a {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar ul {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+}

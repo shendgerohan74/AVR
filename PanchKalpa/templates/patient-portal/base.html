@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <title>{% block title %}{% endblock title %} | Panchkalpa</title>
+
+    <link rel="stylesheet" href="{% static 'css/patient-portal/base.css' %}">
+    {% block style %}{% endblock style %}
+</head>
+
+<body>
+
+    <nav class="dashboard-navbar-container">
+        <!-- 1. Logo -->
+        <div class="dashboard-logo-wrapper">
+            <img src="/static/assets/panchkalpa-logo-trans.png" alt="Panchkalpa">
+        </div>
+
+        <!-- 2. Navigation Links -->
+        <div class="dashboard-nav-links-group">
+            <a href="{% url 'patient-dashboard' %}" class="dashboard-nav-item-button active"><i class="fa-brands fa-dashcube"></i>
+                Dashboard</a>
+            <a href="{% url 'patient-appointments' %}" class="dashboard-nav-item-button"><i class="fa-solid fa-video"></i>
+                Appointments</a>
+            <a href="{% url 'patient-progress' %}" class="dashboard-nav-item-button"><i class="fa-regular fa-calendar-check"></i>
+                Progress</a>
+            <a href="{% url 'patient-billing' %}" class="dashboard-nav-item-button"><i class="fa-solid fa-file-invoice"></i>
+                Billing</a>
+            <a href="{% url 'patient-teleconsult' %}" class="dashboard-nav-item-button"><i class="fa-solid fa-headset"></i>
+                Tele-Consult</a>
+
+        </div>
+
+        <!-- 3. Profile & Settings -->
+        <div class="dashboard-nav-profile-section">
+
+            <!-- Notifications (Bell) Wrapper -->
+            <div class="notify-wrapper">
+                <button class="dashboard-nav-item-button"
+                    style="background:none; border:none; cursor:pointer; padding: 10px;" onclick="toggleNotifyPopup()">
+                    <i class="fa-solid fa-bell" style="font-size:1.2rem; color:var(--theme-gold);"></i>
+                    <!-- Unread Badge -->
+                    <span class="notify-badge-count" id="notify-badge" style="display:none;">0</span>
+                </button>
+
+                <!-- POPUP WINDOW -->
+                <div class="notify-popup-window" id="notifyPopup">
+                    <div class="notify-header-bar">
+                        <h3 class="notify-header-title">Notifications</h3>
+                        <button class="notify-action-link" onclick="markAllNotifyRead()">Mark all read</button>
+                    </div>
+                    <div class="notify-content-scroll-area" id="notify-content">
+                        <div style="padding:20px; text-align:center; color:#999;">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Profile Pill -->
+            <div class="dashboard-profile-summary-pill" onclick="window.location.href='{% url 'patient-profile' %}'">
+
+                <!-- Initial -->
+                <div class="dashboard-profile-icon-circle">
+                    {{ request.user.first_name|default:"A"|slice:":1" }}
+                </div>
+
+                <!-- Name -->
+                <div class="dashboard-profile-name-text">
+                    {{ request.user.first_name|default:"Aniket" }}
+                </div>
+        </div>
+
+
+        <!-- Logout -->
+        <button class="dashboard-logout-action" title="Logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Log out
+        </button>
+        </div>
+    </nav>
+    {% block content %}{% endblock content %}
+</body>
+
+</html>

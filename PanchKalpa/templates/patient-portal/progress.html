@@ -1,0 +1,199 @@
+{% extends "patient-portal/base.html" %}
+
+{% load static %}
+
+{% block title %}Therapy Progress{% endblock title %}
+        
+
+{% block style %}
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static "css/patient-portal/progress.css" %}">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{% endblock style %}
+
+
+{% block content %}
+
+    <!-- MAIN CONTENT -->
+    <div class="progress-main-container">
+        
+        <div class="progress-page-header">
+            <h1 class="progress-page-title">Your Recovery Progress</h1>
+        </div>
+
+        <div class="progress-grid-layout">
+            
+            <!-- 1. SYMPTOM SCORE TREND CHART -->
+            <div class="progress-content-card">
+                <div class="progress-card-header">
+                    <i class="fas fa-chart-line" style="color:var(--theme-gold-dark)"></i> Symptom Score Trend
+                </div>
+                <div class="progress-chart-wrapper">
+                    <canvas id="symptomChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 2. OBJECTIVE MEASUREMENTS -->
+            <div class="progress-content-card">
+                <div class="progress-card-header">
+                    <i class="fas fa-heartbeat" style="color:var(--theme-gold-dark)"></i> Objective Measurements
+                </div>
+                
+                <div class="progress-stats-grid">
+                    <!-- BP Widget -->
+                    <div class="progress-stat-box">
+                        <div class="progress-stat-icon"><i class="fas fa-tint"></i></div>
+                        <div class="progress-stat-info">
+                            <h5>Blood Pressure</h5>
+                            <div class="progress-stat-value" id="val-bp">--/--</div>
+                            <span class="progress-stat-unit">mmHg (Normal)</span>
+                        </div>
+                    </div>
+
+                    <!-- Stress Widget -->
+                    <div class="progress-stat-box">
+                        <div class="progress-stat-icon"><i class="fas fa-brain"></i></div>
+                        <div class="progress-stat-info">
+                            <h5>Stress Level</h5>
+                            <div class="progress-stat-value" id="val-stress">--</div>
+                            <span class="progress-stat-unit">Scale of 1-10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. AUTO-GENERATED REPORTS -->
+            <div class="progress-content-card">
+                <div class="progress-card-header">
+                    <i class="fas fa-file-medical-alt" style="color:var(--theme-gold-dark)"></i> Auto-generated Reports
+                </div>
+                
+                <div class="progress-report-container">
+                    <div class="progress-report-info">
+                        <h4>Weekly Health Summary</h4>
+                        <p>Generated on <span id="report-date">--</span> based on your daily logs.</p>
+                    </div>
+                    <button class="progress-download-btn" onclick="downloadReport()">
+                        <i class="fas fa-download"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProgressData();
+            
+            // Header User Logic (Mock if needed)
+            const user = { name: "Aniket" };
+            document.getElementById('header-name').textContent = user.name;
+            document.getElementById('header-initial').textContent = user.name.charAt(0);
+        });
+
+        // --- 2. FETCH DATA (BACKEND CONNECTION) ---
+        async function fetchProgressData() {
+            
+            // Default Fallback Data
+            let data = {
+                measurements: { bp: "120/80", stress: 4 },
+                chart: { labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"], scores: [8, 7, 5, 4, 2] },
+                reportDate: new Date().toLocaleDateString()
+            };
+
+            try {
+                // 🟢 CONNECT TO BACKEND
+                const response = await fetch('/api/patient/progress/', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 'X-CSRFToken': getCookie('csrftoken') // Use if needed
+                    }
+                });
+
+                if (response.ok) {
+                    const backendData = await response.json();
+                    data = backendData; // Use backend data if successful
+                    console.log("Data loaded from Backend");
+                } else {
+                    console.warn("Backend not reachable, using Mock Data");
+                }
+
+            } catch (error) {
+                console.error("Connection failed:", error);
+            }
+
+            // Render with whatever data we have (Backend or Mock)
+            renderPage(data);
+        }
+
+        // --- 3. RENDER UI ---
+        function renderPage(data) {
+            // Measurements
+            document.getElementById('val-bp').textContent = data.measurements.bp || "--/--";
+            document.getElementById('val-stress').textContent = data.measurements.stress || "--";
+            document.getElementById('report-date').textContent = data.reportDate || "Today";
+
+            // Chart
+            if (data.chart) {
+                initChart(data.chart);
+            }
+        }
+
+        function initChart(chartData) {
+            const ctx = document.getElementById('symptomChart').getContext('2d');
+            
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(120, 53, 15, 0.2)'); 
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: 'Average Symptom Severity (0-10)',
+                        data: chartData.scores,
+                        borderColor: '#78350f', 
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#FFD700',
+                        pointBorderColor: '#78350f',
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        y: {
+                            beginAtZero: true, max: 10,
+                            title: { display: true, text: 'Severity Score' },
+                            grid: { borderDash: [5, 5], color: '#e0e0e0' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // --- 4. ACTIONS ---
+        function downloadReport() {
+            // Trigger backend PDF generation
+            window.location.href = '/api/patient/progress/download/';
+        }
+    </script>
+
+{% endblock content %}  

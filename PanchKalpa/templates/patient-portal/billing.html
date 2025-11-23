@@ -1,0 +1,90 @@
+{% extends "patient-portal/base.html" %}
+
+{% load static %}
+{% block title %}Billing & Payments{% endblock title %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/patient-portal/billing.css' %}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+{% endblock style %}
+
+{% block content %}
+
+    <div class="billing-main-container">
+
+        <div class="billing-page-header">
+            <h1 class="billing-page-title">Billing & Payments</h1>
+        </div>
+
+        <!-- Pending Bills -->
+        <div class="billing-content-card">
+            <div class="billing-card-header">
+                <i class="fas fa-file-invoice-dollar"></i> Pending Bills
+            </div>
+
+            <div class="billing-pending-list">
+                {% if pending %}
+                    {% for bill in pending %}
+                        <div class="billing-pending-item">
+                            <div class="billing-info-group">
+                                <h4>Invoice #{{ bill.invoice_id }}</h4>
+                                <p>{{ bill.therapy }}</p>
+                            </div>
+
+                            <div class="billing-amount-box">
+                                <span class="billing-price">₹{{ bill.amount }}</span>
+                                <a href="{% url 'pay_bill' bill.invoice_id %}" class="billing-pay-btn">
+                                    Pay Now <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="billing-empty-state">No pending bills</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="billing-content-card">
+            <div class="billing-card-header">
+                <i class="fas fa-history"></i> Payment History
+            </div>
+
+            <table class="billing-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Invoice ID</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% if history %}
+                    {% for bill in history %}
+                    <tr>
+                        <td>{{ bill.date }}</td>
+                        <td>#{{ bill.invoice_id }}</td>
+                        <td>{{ bill.therapy }}</td>
+                        <td>₹{{ bill.amount }}</td>
+                        <td><span class="billing-status-badge status-paid">Paid</span></td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="billing-empty-state">No payment history</td>
+                    </tr>
+                {% endif %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+{% endblock content %}
