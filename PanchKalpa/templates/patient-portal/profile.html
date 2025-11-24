@@ -36,19 +36,27 @@
 
             <div class="profile-basic-info">
                 <!-- NAME -->
-                <h1 class="profile-value-text" id="view-name"> {{request.user.first_name| default:"User" }}</h1>
+                <h1 class="profile-value-text" id="view-name">
+                    {{ patient.user.first_name }} {{ patient.user.last_name }}
+                </h1>
+
                 <input type="text" class="profile-edit-input" id="input-name"
                     style="font-size:1.5rem; text-align:center; margin-bottom:10px;">
 
                 <div class="profile-demographics-row">
                     <div class="profile-demographics-item">
                         <i class="fas fa-birthday-cake"></i>
-                        <span class="profile-value-text" id="view-age"> {{request.user.age | default:"--"}} </span>
+                        <span class="profile-value-text" id="view-age">
+                            {{ patient.age|default:"--" }} Years
+                        </span>
                         <input type="number" class="profile-edit-input" id="input-age" style="width:80px;">
                     </div>
+
                     <div class="profile-demographics-item">
                         <i class="fas fa-venus-mars"></i>
-                        <span class="profile-value-text" id="view-gender"> {{request.user.gender | default:"--"}} </span>
+                        <span class="profile-value-text" id="view-gender">
+                            {{ patient.gender|default:"--" }}
+                        </span>
                         <select class="profile-edit-input" id="input-gender" style="width:100px;">
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -68,13 +76,17 @@
 
                 <div class="profile-info-group">
                     <label class="profile-label">Email Address</label>
-                    <div class="profile-value-text" id="view-email"> {{request.user.email | default:"user@panchkalpa.in"}} </div>
+                    <div class="profile-value-text" id="view-email">
+                        {{ patient.user.email|default:"user@panchkalpa.in" }}
+                    </div>
                     <input type="email" class="profile-edit-input" id="input-email">
                 </div>
 
                 <div class="profile-info-group">
                     <label class="profile-label">Phone Number</label>
-                    <div class="profile-value-text" id="view-phone"> {{request.user.contact | default:"9876543210"}} </div>
+                    <div class="profile-value-text" id="view-phone">
+                        {{ patient.contact|default:"9876543210" }}
+                    </div>
                     <input type="tel" class="profile-edit-input" id="input-phone">
                 </div>
             </div>
@@ -85,19 +97,23 @@
 
                 <div class="profile-info-group">
                     <label class="profile-label" style="color:#c62828;">Allergies</label>
-                    <div class="profile-value-text" id="view-allergies"> {{request.user.allergies | default:"None"}} </div>
+                    <div class="profile-value-text" id="view-allergies">
+                        {{ patient.allergies|default:"None" }}
+                    </div>
                     <input type="text" class="profile-edit-input" id="input-allergies" placeholder="e.g. Peanuts, Dust">
                 </div>
 
                 <div class="profile-info-group">
                     <label class="profile-label">Current Medications</label>
-                    <div class="profile-value-text" id="view-meds"> None</div>
+                    <div class="profile-value-text" id="view-meds">None</div>
                     <input type="text" class="profile-edit-input" id="input-meds" placeholder="e.g. Ashwagandha">
                 </div>
-                
+
                 <div class="profile-info-group">
                     <label class="profile-label">Emergency Contact</label>
-                    <div class="profile-value-text" id="view-emergency"> {{request.user.contact | default:"9876543210"}} </div>
+                    <div class="profile-value-text" id="view-emergency">
+                        {{ patient.contact|default:"9876543210" }}
+                    </div>
                     <input type="text" class="profile-edit-input" id="input-emergency" placeholder="Name & Number">
                 </div>
             </div>
@@ -126,135 +142,62 @@
     </div>
 
 </div>
-
-<!-- JAVASCRIPT LOGIC -->
 <script>
-    // --- 1. INITIALIZATION ---
-    document.addEventListener('DOMContentLoaded', () => {
-        fetchProfileData();
-    });
-
-    // --- 2. FETCH DATA (GET) ---
-    async function fetchProfileData() {
-        try {
-            // In real app: const res = await fetch('/api/patient/profile/');
-            // const data = await res.json();
-
-            // MOCK DATA FALLBACK
-            const data = {
-                name: "Aniket Sharma",
-                age: 28,
-                gender: "Male",
-                email: "aniket.sharma@example.com",
-                phone: "+91 98765 43210",
-                allergies: "Peanuts, Dust Mites",
-                medications: "Triphala Churna (Night), Ashwagandha",
-                emergency: "Rajesh Sharma (+91 99999 88888)",
-                photo: "https://randomuser.me/api/portraits/men/32.jpg"
-            };
-
-            populateUI(data);
-
-        } catch (error) {
-            console.error("Error loading profile:", error);
-        }
-    }
-
-    function populateUI(data) {
-        // Populate View Elements
-        document.getElementById('view-name').textContent = data.name;
-        document.getElementById('view-age').textContent = data.age + ' Years';
-        document.getElementById('view-gender').textContent = data.gender;
-        document.getElementById('view-email').textContent = data.email;
-        document.getElementById('view-phone').textContent = data.phone;
-        document.getElementById('view-allergies').textContent = data.allergies;
-        document.getElementById('view-meds').textContent = data.medications;
-        document.getElementById('view-emergency').textContent = data.emergency;
-        document.getElementById('view-photo').src = data.photo;
-
-        // Populate Input Elements (for editing)
-        document.getElementById('input-name').value = data.name;
-        document.getElementById('input-age').value = data.age;
-        document.getElementById('input-gender').value = data.gender;
-        document.getElementById('input-email').value = data.email;
-        document.getElementById('input-phone').value = data.phone;
-        document.getElementById('input-allergies').value = data.allergies;
-        document.getElementById('input-meds').value = data.medications;
-        document.getElementById('input-emergency').value = data.emergency;
-    }
-
-    // --- 3. MODE TOGGLE ---
     function enableEditMode() {
-        document.getElementById('profileContainer').classList.add('mode-edit');
-    }
+    document.getElementById("profileContainer").classList.add("mode-edit");
+}
 
-    function cancelEditMode() {
-        document.getElementById('profileContainer').classList.remove('mode-edit');
-        fetchProfileData(); // Revert changes by reloading data
-    }
+function cancelEditMode() {
+    document.getElementById("profileContainer").classList.remove("mode-edit");
+}
 
-    // --- 4. SAVE DATA (PUT) ---
-    async function saveProfileData() {
-        const btn = document.querySelector('.btn-save');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
-        // 1. Gather Data from Inputs
-        const updatedData = {
-            name: document.getElementById('input-name').value,
-            age: document.getElementById('input-age').value,
-            gender: document.getElementById('input-gender').value,
-            email: document.getElementById('input-email').value,
-            phone: document.getElementById('input-phone').value,
-            allergies: document.getElementById('input-allergies').value,
-            medications: document.getElementById('input-meds').value,
-            emergency: document.getElementById('input-emergency').value,
-            // For photo, handle File Upload separately in real backend
-        };
-
-        try {
-            // REAL BACKEND CALL:
-            // const response = await fetch('/api/patient/profile/', {
-            //     method: 'PUT',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'X-CSRFToken': getCookie('csrftoken')
-            //     },
-            //     body: JSON.stringify(updatedData)
-            // });
-
-            // SIMULATED DELAY & SUCCESS
-            await new Promise(r => setTimeout(r, 1000));
-
-            // Update UI with new data (Mocking the backend response)
-            updatedData.photo = document.getElementById('view-photo').src; // Keep old photo for demo
-            populateUI(updatedData);
-
-            alert("Profile Updated Successfully!");
-            document.getElementById('profileContainer').classList.remove('mode-edit');
-
-        } catch (error) {
-            alert("Failed to save profile.");
-            console.error(error);
-        } finally {
-            btn.innerHTML = originalText;
-        }
-    }
-
-    // Helper for Django CSRF (Keep this for your backend integration)
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i <script cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
         }
-        return cookieValue;
     }
+    return cookieValue;
+}
+
+async function saveProfileData() {
+
+    const updatedData = {
+        first_name: document.getElementById("input-name").value.split(" ")[0],
+        last_name: document.getElementById("input-name").value.split(" ")[1] || "",
+        email: document.getElementById("input-email").value,
+        age: document.getElementById("input-age").value,
+        gender: document.getElementById("input-gender").value,
+        contact: document.getElementById("input-phone").value,
+        allergies: document.getElementById("input-allergies").value,
+    };
+
+    const response = await fetch("/patient/update-profile/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify(updatedData),
+    });
+
+
+    const res = await response.json();
+
+    if (res.status === "success") {
+        alert("Profile Updated Successfully!");
+        location.reload();
+    } else {
+        alert("Failed to update profile");
+    }
+}
+
+
 </script>
 {% endblock content %}
