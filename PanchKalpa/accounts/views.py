@@ -17,6 +17,10 @@ def logout_view(request):
     messages.success(request, "You have succesfully logged out See you Again Soon ....!!!!")
     return redirect("/")
 
+# Therapist signup Stopper
+def therapist_signup(request):
+    return messages.error(request, "Therapist can be added only by admin..!!")
+
 #  SIGNUP PAGE 
 def signup_view(request):
     if request.method == "POST":

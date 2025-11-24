@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from therapist.models import Therapist, Therapy
+from django.conf import settings
+
+
 
 class PatientProfile(models.Model):
     user = models.OneToOneField(
@@ -17,3 +21,17 @@ class PatientProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+from django.db import models
+from django.contrib.auth.models import User
+from therapist.models import Therapist, Therapy
+
+class Appointment(models.Model):
+    patient = models.ForeignKey(User, on_delete=models.CASCADE)
+    therapy = models.ForeignKey(Therapy, on_delete=models.CASCADE)
+    therapist = models.ForeignKey(Therapist, on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.patient.username} - {self.therapy.name}"
