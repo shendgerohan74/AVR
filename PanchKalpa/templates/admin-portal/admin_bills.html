@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin | Bills & Payments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --theme-gold: #FFD700;
+            --theme-brown: #78350f;
+            --theme-bg-light: #FFF7E5;
+            --theme-white: #ffffff;
+            --theme-muted: #6b5f5a;
+            --nav-height: 80px;
+            --theme-shadow: 0 4px 15px rgba(120,53,15,0.12);
+
+            --paid-bg: #E8F5E9;
+            --paid-text: #2E7D32;
+
+            --pending-bg: #FFF3CD;
+            --pending-text: #B8860B;
+
+            --due-bg: #FFEBEE;
+            --due-text: #C62828;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Lato', sans-serif;
+            background: var(--theme-bg-light);
+            padding-top: var(--nav-height);
+            color: #2A241F;
+        }
+
+        h1, h2 {
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+            color: var(--theme-brown);
+        }
+
+        /* NAVBAR */
+        .dashboard-navbar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: var(--nav-height);
+            width: 100%;
+            background: var(--theme-brown);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 200;
+            flex-wrap: wrap; 
+        }
+
+        .dashboard-logo-wrapper img {
+            height: 100px;
+            margin-top: 8px;
+            object-fit: contain;
+        }
+
+        .dashboard-nav-links-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dashboard-nav-item-button {
+            padding: 10px 18px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: rgba(255,255,255,0.85);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .dashboard-nav-item-button i {
+            color: var(--theme-gold);
+        }
+
+        .dashboard-nav-item-button:hover {
+            background: rgba(255,255,255,0.12);
+            color: var(--theme-gold);
+        }
+
+        .dashboard-nav-item-button.active {
+            background: var(--theme-gold);
+            color: var(--theme-brown) !important;
+            font-weight: 700;
+        }
+
+        .dashboard-nav-item-button.active i {
+            color: var(--theme-brown);
+        }
+
+        .dashboard-profile-summary-pill {
+            padding: 6px 15px 6px 6px;
+            border-radius: 30px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,215,0,0.25);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-profile-icon-circle {
+            width: 32px;
+            height: 32px;
+            background: var(--theme-gold);
+            color: var(--theme-brown);
+            border-radius: 50%;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Playfair Display";
+        }
+
+        .dashboard-profile-name-text {
+            color: white;
+            font-weight: bold;
+        }
+
+        /* MAIN */
+        .dashboard-main-container {
+            max-width: 1400px;
+            padding: 40px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-primary {
+            background: var(--theme-brown);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover { background: #5A260C; }
+
+        /* CARD */
+        .card {
+            background: var(--theme-white);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,215,0,0.25);
+            box-shadow: var(--theme-shadow);
+        }
+
+        /* TABLE */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .table th {
+            padding: 14px;
+            text-align: left;
+            color: var(--theme-muted);
+            border-bottom: 2px solid #eee;
+        }
+
+        .table td {
+            padding: 14px;
+            border-bottom: 1px solid #f6e8d2;
+        }
+
+        .table tr:hover {
+            background: #FFF1C9;
+        }
+
+        /* BILL STATUS */
+        .status {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .paid { background: var(--paid-bg); color: var(--paid-text); }
+        .pending { background: var(--pending-bg); color: var(--pending-text); }
+        .due { background: var(--due-bg); color: var(--due-text); }
+
+        /* ACTION BUTTONS */
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 1.1rem;
+            color: var(--theme-brown);
+        }
+        .action-btn:hover { transform: scale(1.15); }
+
+
+        /* ---------- RESPONSIVE (MOBILE/TABLET) ---------- */
+@media (max-width: 900px) {
+
+    /* Body padding thoda kam */
+    .dashboard-main-container {
+        padding: 20px 16px;
+    }
+
+    .dashboard-navbar-container {
+        padding: 0 16px;
+    }
+
+    /* Logo thoda chhota */
+    .dashboard-logo-wrapper img {
+        height: 70px;
+    }
+
+    /* Desktop nav hide, hamburger show */
+    .dashboard-nav-links-group {
+        position: absolute;
+        top: var(--nav-height);
+        left: 0;
+        right: 0;
+        background: var(--theme-brown);
+        flex-direction: column;
+        padding: 10px 16px 16px;
+        gap: 6px;
+        display: none;   /* default hidden on mobile */
+    }
+
+    .dashboard-nav-links-group.open {
+        display: flex;   /* toggle se visible */
+    }
+
+    .dashboard-nav-item-button {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    /* Hamburger button visible on mobile */
+    .nav-toggle {
+        display: block;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.4rem;
+        cursor: pointer;
+        margin-left: auto;
+    }
+
+    /* Profile chip ko bhi menu ke niche shift kar dete */
+    .dashboard-profile-summary-pill {
+        display: none; /* top-right se gayab */
+    }
+
+    .dashboard-nav-links-group.open + .dashboard-profile-summary-pill {
+        /* agar chaho to yeh CSS use karke profile ko bhi mobile menu ke niche dikha sakte ho, 
+           to isko uncomment kar sakte ho */
+    }
+
+    /* GRID / CARDS stack */
+    .dashboard-layout-grid,
+    .admin-stats-grid,
+    .admin-quick-grid,
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+
+    .col-span-4,
+    .col-span-8,
+    .col-span-12 {
+        grid-column: span 1 !important;
+    }
+
+    /* Tables scrollable on small screens */
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+ 
+/* Desktop: hamburger hide */
+@media (min-width: 901px) {
+    .nav-toggle {
+        display: none;
+    }
+}
+
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="dashboard-navbar-container">
+    <div class="dashboard-logo-wrapper">
+        <img src="assets/panchkalpa-logo-trans.png" alt="logo"/>
+    </div>
+
+    <button class="nav-toggle" onclick="toggleNav()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="dashboard-nav-links-group">
+        <a href="admin_dashboard.html" class="dashboard-nav-item-button"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="admin_patients.html" class="dashboard-nav-item-button"><i class="fa-solid fa-users"></i> Patients</a>
+        <a href="admin_therapists.html" class="dashboard-nav-item-button"><i class="fa-solid fa-user-doctor"></i> Therapists</a>
+        <a href="admin_inventory.html" class="dashboard-nav-item-button"><i class="fa-solid fa-flask"></i> Inventory</a>
+        <a href="admin_inventory_alerts.html" class="dashboard-nav-item-button"><i class="fa-solid fa-triangle-exclamation"></i> Alerts</a>
+        <a href="admin_appointments.html" class="dashboard-nav-item-button"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
+        <a href="admin_bills.html" class="dashboard-nav-item-button active"><i class="fa-solid fa-receipt"></i> Bills</a>
+        <a href="admin_reports.html" class="dashboard-nav-item-button"><i class="fa-solid fa-chart-pie"></i> Reports</a>
+        <a href="admin_insurance_claims.html" class="dashboard-nav-item-button"><i class="fa-solid fa-file-invoice-dollar"></i> Claims</a>
+    </div>
+
+    <div class="dashboard-profile-summary-pill">
+        <div class="dashboard-profile-icon-circle">AD</div>
+        <div class="dashboard-profile-name-text">Admin</div>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="dashboard-main-container">
+
+    <div class="page-header">
+        <h1>Bills & Payments</h1>
+        <button class="btn-primary"><i class="fa-solid fa-plus"></i> Generate Bill</button>
+    </div>
+
+    <div class="card">
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Bill No</th>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Amount (₹)</th>
+                <th>Status</th>
+                <th>Download</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr>
+                <td>#B-1001</td>
+                <td>Aniket Sharma</td>
+                <td>21 Nov 2025</td>
+                <td>1200</td>
+                <td><span class="status paid">Paid</span></td>
+                <td><button class="action-btn"><i class="fa-solid fa-download"></i></button></td>
+                <td><button class="action-btn"><i class="fa-solid fa-eye"></i></button></td>
+            </tr>
+
+            <tr>
+                <td>#B-1002</td>
+                <td>Priya Singh</td>
+                <td>20 Nov 2025</td>
+                <td>950</td>
+                <td><span class="status pending">Pending</span></td>
+                <td><button class="action-btn"><i class="fa-solid fa-download"></i></button></td>
+                <td><button class="action-btn"><i class="fa-solid fa-pen"></i></button></td>
+            </tr>
+
+            <tr>
+                <td>#B-1003</td>
+                <td>Rahul Verma</td>
+                <td>19 Nov 2025</td>
+                <td>500</td>
+                <td><span class="status due">Overdue</span></td>
+                <td><button class="action-btn"><i class="fa-solid fa-download"></i></button></td>
+                <td><button class="action-btn"><i class="fa-solid fa-rotate-left"></i></button></td>
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+    function toggleNav() {
+        const menu = document.querySelector('.dashboard-nav-links-group');
+        if (menu) {
+            menu.classList.toggle('open');
+        }
+    }
+</script>
+
+
+</body>
+</html>

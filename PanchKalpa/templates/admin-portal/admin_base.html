@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Portal | Panchkalpa{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Admin CSS (same theme system as therapist) -->
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+
+<body>
+
+    <!-- ADMIN NAVBAR (same as therapist portal) -->
+    <nav class="dashboard-navbar-container">
+        <!-- Left Logo -->
+        <div class="dashboard-logo-wrapper">
+            <img src="{% static 'assets/panchkalpa-logo-trans.png' %}" alt="Panchkalpa">
+        </div>
+
+        <button class="nav-toggle" onclick="toggleNav()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+        <!-- CENTER NAV LINKS -->
+        <div class="dashboard-nav-links-group">
+
+            <a href="{% url 'admin-dashboard' %}" 
+               class="dashboard-nav-item-button {% if request.resolver_match.url_name == 'admin-dashboard' %}active{% endif %}">
+               <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
+
+            <a href="{% url 'admin-patients' %}" 
+               class="dashboard-nav-item-button {% if request.resolver_match.url_name == 'admin-patients' %}active{% endif %}">
+               <i class="fa-solid fa-users"></i> Patients
+            </a>
+
+            <a href="{% url 'admin-therapists' %}" 
+               class="dashboard-nav-item-button {% if request.resolver_match.url_name == 'admin-therapists' %}active{% endif %}">
+               <i class="fa-solid fa-user-doctor"></i> Therapists
+            </a>
+
+            <a href="{% url 'admin-inventory' %}" 
+               class="dashboard-nav-item-button {% if request.resolver_match.url_name == 'admin-inventory' %}active{% endif %}">
+               <i class="fa-solid fa-flask"></i> Inventory
+            </a>
+
+            <a href="{% url 'admin-inventory-alerts' %}" 
+               class="dashboard-nav-item-button {% if request.resolver_match.url_name == 'admin-inventory-alerts' %}active{% endif %}">
+               <i class="fa-solid fa-triangle-exclamation"></i> Inventory Alerts
+            </a>
+
+            <a href="{% url 'admin-appointments' %}" 
+               class="dashboard-nav-item-button {% if request.resolver_match.url_name == 'admin-appointments' %}active{% endif %}">
+               <i class="fa-solid fa-calendar-check"></i> Appointments
+            </a>
+
+            <a href="{% url 'admin-bills' %}" 
+               class="dashboard-nav-item-button {% if request.resolver_match.url_name == 'admin-bills' %}active{% endif %}">
+               <i class="fa-solid fa-receipt"></i> Bills
+            </a>
+
+            <a href="{% url 'admin-reports' %}" 
+               class="dashboard-nav-item-button {% if request.resolver_match.url_name == 'admin-reports' %}active{% endif %}">
+               <i class="fa-solid fa-chart-pie"></i> Reports
+            </a>
+
+            <a href="{% url 'admin-insurance-claims' %}" 
+               class="dashboard-nav-item-button {% if request.resolver_match.url_name == 'admin-insurance-claims' %}active{% endif %}">
+               <i class="fa-solid fa-file-invoice-dollar"></i> Insurance Claims
+            </a>
+
+        </div>
+
+        <!-- PROFILE RIGHT SIDE -->
+        <div class="dashboard-nav-profile-section">
+            <div class="dashboard-profile-summary-pill">
+                <div class="dashboard-profile-icon-circle">A</div>
+                <div class="dashboard-profile-name-text">Admin</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN PAGE CONTENT -->
+    <div class="dashboard-main-container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script>
+    function toggleNav() {
+        const menu = document.querySelector('.dashboard-nav-links-group');
+        if (menu) {
+            menu.classList.toggle('open');
+        }
+    }
+</script>
+
+
+</body>
+</html>

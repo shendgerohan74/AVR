@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin | Therapists</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --theme-gold: #FFD700;
+            --theme-brown: #78350f;
+            --theme-bg-light: #FFF7E5;
+            --theme-white: #ffffff;
+            --theme-muted: #6b5f5a;
+            --theme-shadow: 0 4px 15px rgba(120, 53, 15, 0.1);
+            --theme-radius: 12px;
+            --nav-height: 80px;
+            --status-success-bg: #E8F5E9;
+            --status-success-text: #2E7D32;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Lato", sans-serif;
+            background: var(--theme-bg-light);
+            padding-top: var(--nav-height);
+            color: #2A241F;
+        }
+
+        h1, h2, h3 {
+            font-family: "Playfair Display", serif;
+            margin: 0;
+            color: var(--theme-brown);
+        }
+
+        /* NAVBAR */
+        .dashboard-navbar-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background: var(--theme-brown);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 100;
+            flex-wrap: wrap; 
+        }
+
+        .dashboard-logo-wrapper img {
+            height: 100px;
+            object-fit: contain;
+            margin-top: 8px;
+        }
+
+        .dashboard-nav-links-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dashboard-nav-item-button {
+            padding: 10px 18px;
+            border-radius: 20px;
+            color: rgba(255,255,255,0.85);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .dashboard-nav-item-button:hover {
+            background: rgba(255,255,255,0.12);
+            color: var(--theme-gold);
+        }
+
+        .dashboard-nav-item-button.active {
+            background: var(--theme-gold);
+            color: var(--theme-brown);
+            font-weight: bold;
+        }
+
+        .dashboard-nav-item-button i {
+            color: var(--theme-gold);
+        }
+        .dashboard-nav-item-button.active i {
+            color: var(--theme-brown);
+        }
+
+        .dashboard-profile-summary-pill {
+            display: flex;
+            align-items: center;
+            padding: 6px 15px 6px 6px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,215,0,0.2);
+            background: rgba(0,0,0,0.25);
+            gap: 10px;
+        }
+
+        .dashboard-profile-icon-circle {
+            width: 32px;
+            height: 32px;
+            background: var(--theme-gold);
+            color: var(--theme-brown);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .dashboard-profile-name-text {
+            color: white;
+            font-weight: bold;
+        }
+
+        /* MAIN */
+        .dashboard-main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            background: var(--theme-brown);
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #5a260c;
+        }
+
+        .card {
+            background: var(--theme-white);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--theme-shadow);
+            border: 1px solid rgba(255,215,0,0.25);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .table th {
+            padding: 14px;
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--theme-muted);
+            border-bottom: 2px solid #eee;
+        }
+
+        .table td {
+            padding: 14px;
+            border-bottom: 1px solid #f3e7d5;
+        }
+
+        .table tr:hover {
+            background: #fff4d2;
+        }
+
+        .status-online {
+            background: var(--status-success-bg);
+            color: var(--status-success-text);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--theme-brown);
+            font-size: 1rem;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            color: black;
+        }
+        /* ---------- RESPONSIVE (MOBILE/TABLET) ---------- */
+@media (max-width: 900px) {
+
+    /* Body padding thoda kam */
+    .dashboard-main-container {
+        padding: 20px 16px;
+    }
+
+    .dashboard-navbar-container {
+        padding: 0 16px;
+    }
+
+    /* Logo thoda chhota */
+    .dashboard-logo-wrapper img {
+        height: 70px;
+    }
+
+    /* Desktop nav hide, hamburger show */
+    .dashboard-nav-links-group {
+        position: absolute;
+        top: var(--nav-height);
+        left: 0;
+        right: 0;
+        background: var(--theme-brown);
+        flex-direction: column;
+        padding: 10px 16px 16px;
+        gap: 6px;
+        display: none;   /* default hidden on mobile */
+    }
+
+    .dashboard-nav-links-group.open {
+        display: flex;   /* toggle se visible */
+    }
+
+    .dashboard-nav-item-button {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    /* Hamburger button visible on mobile */
+    .nav-toggle {
+        display: block;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.4rem;
+        cursor: pointer;
+        margin-left: auto;
+    }
+
+    /* Profile chip ko bhi menu ke niche shift kar dete */
+    .dashboard-profile-summary-pill {
+        display: none; /* top-right se gayab */
+    }
+
+    .dashboard-nav-links-group.open + .dashboard-profile-summary-pill {
+        /* agar chaho to yeh CSS use karke profile ko bhi mobile menu ke niche dikha sakte ho, 
+           to isko uncomment kar sakte ho */
+    }
+
+    /* GRID / CARDS stack */
+    .dashboard-layout-grid,
+    .admin-stats-grid,
+    .admin-quick-grid,
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+
+    .col-span-4,
+    .col-span-8,
+    .col-span-12 {
+        grid-column: span 1 !important;
+    }
+
+    /* Tables scrollable on small screens */
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+ 
+/* Desktop: hamburger hide */
+@media (min-width: 901px) {
+    .nav-toggle {
+        display: none;
+    }
+}
+
+
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="dashboard-navbar-container">
+
+    <div class="dashboard-logo-wrapper">
+        <img src="assets/panchkalpa-logo-trans.png">
+    </div>
+    <button class="nav-toggle" onclick="toggleNav()">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="dashboard-nav-links-group">
+        <a href="admin_dashboard.html" class="dashboard-nav-item-button"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="admin_patients.html" class="dashboard-nav-item-button"><i class="fa-solid fa-users"></i> Patients</a>
+        <a href="admin_therapists.html" class="dashboard-nav-item-button active"><i class="fa-solid fa-user-doctor"></i> Therapists</a>
+        <a href="admin_inventory.html" class="dashboard-nav-item-button"><i class="fa-solid fa-flask"></i> Inventory</a>
+        <a href="admin_inventory_alerts.html" class="dashboard-nav-item-button"><i class="fa-solid fa-triangle-exclamation"></i> Alerts</a>
+        <a href="admin_appointments.html" class="dashboard-nav-item-button"><i class="fa-solid fa-calendar-check"></i> Appointments</a>
+        <a href="admin_bills.html" class="dashboard-nav-item-button"><i class="fa-solid fa-receipt"></i> Bills</a>
+        <a href="admin_reports.html" class="dashboard-nav-item-button"><i class="fa-solid fa-chart-pie"></i> Reports</a>
+        <a href="admin_insurance_claims.html" class="dashboard-nav-item-button"><i class="fa-solid fa-file-invoice-dollar"></i> Claims</a>
+    </div>
+
+    <div class="dashboard-profile-summary-pill">
+        <div class="dashboard-profile-icon-circle">AD</div>
+        <div class="dashboard-profile-name-text">Admin</div>
+    </div>
+
+</nav>
+
+<!-- CONTENT -->
+<div class="dashboard-main-container">
+
+    <div class="page-header">
+        <h1>Therapists</h1>
+        <button class="btn-primary"><i class="fa-solid fa-user-plus"></i> Add Therapist</button>
+    </div>
+
+    <div class="card">
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Experience</th>
+                <th>Speciality</th>
+                <th>Availability</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <tr>
+                <td>T-01</td>
+                <td><strong>Dr. Ananya</strong></td>
+                <td>8 Years</td>
+                <td>Shirodhara</td>
+                <td><span class="status-online">Available</span></td>
+                <td>
+                    <button class="action-btn"><i class="fa-solid fa-edit"></i></button>
+                    <button class="action-btn"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+
+            <tr>
+                <td>T-02</td>
+                <td><strong>Dr. Meera</strong></td>
+                <td>5 Years</td>
+                <td>Abhyanga</td>
+                <td><span class="status-online">Available</span></td>
+                <td>
+                    <button class="action-btn"><i class="fa-solid fa-edit"></i></button>
+                    <button class="action-btn"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+
+            <tr>
+                <td>T-03</td>
+                <td><strong>Dr. Karan</strong></td>
+                <td>6 Years</td>
+                <td>Nasya</td>
+                <td><span class="status-online">Available</span></td>
+                <td>
+                    <button class="action-btn"><i class="fa-solid fa-edit"></i></button>
+                    <button class="action-btn"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+<script>
+    function toggleNav() {
+        const menu = document.querySelector('.dashboard-nav-links-group');
+        if (menu) {
+            menu.classList.toggle('open');
+        }
+    }
+</script>
+
+
+</body>
+</html>
