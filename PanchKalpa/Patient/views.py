@@ -6,10 +6,17 @@ import json
 from Patient.models import PatientProfile, Appointment
 from therapist.models import Therapist, Therapy
 
-
 # ------------------ Dashboard ------------------
+@login_required
 def dashboard(request):
-    return render(request, "patient-portal/dashboard.html")
+    # Get ALL upcoming appointments
+    upcoming = Appointment.objects.filter(
+        patient=request.user
+    ).order_by("date", "time")
+
+    return render(request, "patient-portal/dashboard.html", {
+        "upcoming": upcoming
+    })
 
 
 # ------------------ Appointments ------------------
