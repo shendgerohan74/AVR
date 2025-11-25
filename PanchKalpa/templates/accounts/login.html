@@ -37,7 +37,8 @@
             </div>
 
             <!-- LOGIN FORM -->
-            <form id="loginForm" class="form active-form" method="POST" action="{% url 'login' %}">
+          <form id="loginForm" method="POST" action="{% url 'therapist_login' %}">
+
                 {% csrf_token %}
 
                 <label>Email Address</label>

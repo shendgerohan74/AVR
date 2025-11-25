@@ -113,27 +113,64 @@
 <body>
 
     <!-- NAVBAR -->
-    <nav class="dashboard-navbar-container">
-        <div class="dashboard-logo-wrapper">
-            <img src="/static/assets/panchkalpa-logo-trans.png" alt="Panchkalpa" height="80">
-        </div>
+   <nav class="dashboard-navbar-container">
+    <div class="dashboard-logo-wrapper">
+        <img src="/static/assets/panchkalpa-logo-trans.png" alt="Panchkalpa" height="80">
+    </div>
 
-        <div class="dashboard-nav-links-group">
-            <a href="dashboard.html" class="dashboard-nav-item-button"><i class="fa-brands fa-dashcube"></i> Dashboard</a>
-            <a href="patients.html" class="dashboard-nav-item-button"><i class="fa-solid fa-users"></i> Patients</a>
-            <a href="session-entry.html" class="dashboard-nav-item-button"><i class="fa-solid fa-file-medical"></i> Session Entry</a>
-            <a href="teleconsult.html" class="dashboard-nav-item-button active"><i class="fa-solid fa-video"></i> Teleconsult</a>
-            <a href="inventory.html" class="dashboard-nav-item-button"><i class="fa-solid fa-flask"></i> Inventory</a>
-            <a href="reports.html" class="dashboard-nav-item-button"><i class="fa-solid fa-chart-pie"></i> Reports</a>
-        </div>
+    <div class="dashboard-nav-links-group">
 
-        <div class="dashboard-nav-profile-section" style="display:flex;align-items:center;gap:15px;">
-            <div class="dashboard-profile-summary-pill" style="display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.2);padding:6px 15px 6px 6px;border-radius:30px;border:1px solid rgba(255,215,0,0.2);">
-                <div class="dashboard-profile-icon-circle" style="width:32px;height:32px;background:var(--theme-gold);color:var(--theme-brown);font-weight:700;border-radius:50%;display:flex;justify-content:center;align-items:center;font-family:'Playfair Display',serif;">DR</div>
-                <div class="dashboard-profile-name-text" style="font-size:0.9rem;color:white;font-weight:600;">Dr. Ananya</div>
+        <a href="{% url 'therapist_dashboard' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/dashboard/' %}active{% endif %}">
+            <i class="fa-brands fa-dashcube"></i> Dashboard
+        </a>
+
+        <a href="{% url 'therapist_patients' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/patients/' %}active{% endif %}">
+            <i class="fa-solid fa-users"></i> Patients
+        </a>
+
+        <a href="{% url 'session_entry' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/session-entry/' %}active{% endif %}">
+            <i class="fa-solid fa-file-medical"></i> Session Entry
+        </a>
+
+        <a href="{% url 'therapist_teleconsult' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/teleconsult/' %}active{% endif %}">
+            <i class="fa-solid fa-video"></i> Teleconsult
+        </a>
+
+        <a href="{% url 'therapist_inventory' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/inventory/' %}active{% endif %}">
+            <i class="fa-solid fa-flask"></i> Inventory
+        </a>
+
+        <a href="{% url 'therapist_reports' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/reports/' %}active{% endif %}">
+            <i class="fa-solid fa-chart-pie"></i> Reports
+        </a>
+
+    </div>
+
+    <div class="dashboard-nav-profile-section" style="display:flex;align-items:center;gap:15px;">
+        <div class="dashboard-profile-summary-pill"
+             style="display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.2);
+             padding:6px 15px 6px 6px;border-radius:30px;border:1px solid rgba(255,215,0,0.2);">
+             
+            <div class="dashboard-profile-icon-circle"
+                 style="width:32px;height:32px;background:var(--theme-gold);
+                 color:var(--theme-brown);font-weight:700;border-radius:50%;
+                 display:flex;justify-content:center;align-items:center;">
+                DR
+            </div>
+            <div class="dashboard-profile-name-text" 
+                 style="font-size:0.9rem;color:white;font-weight:600;">
+                {{ therapist.name }}
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
+
 
     <!-- PAGE CONTENT -->
     <div class="dashboard-main-container">
