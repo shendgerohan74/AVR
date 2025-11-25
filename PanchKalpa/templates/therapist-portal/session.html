@@ -64,6 +64,9 @@
             border:none; border-radius:8px; font-weight:700; cursor:pointer;
         }
     </style>
+    <!-- Select2 CSS -->
+
+
 </head>
 <body>
 
@@ -71,17 +74,47 @@
     <div class="dashboard-logo-wrapper">
         <img src="/static/assets/panchkalpa-logo-trans.png" />
     </div>
+
     <div class="dashboard-nav-links-group">
-        <a href="dashboard.html" class="dashboard-nav-item-button"><i class="fa-brands fa-dashcube"></i> Dashboard</a>
-        <a href="patients.html" class="dashboard-nav-item-button"><i class="fa-solid fa-users"></i> Patients</a>
-        <a href="session-entry.html" class="dashboard-nav-item-button active"><i class="fa-solid fa-file-medical"></i> Session Entry</a>
-        <a href="inventory.html" class="dashboard-nav-item-button"><i class="fa-solid fa-flask"></i> Inventory</a>
-        <a href="reports.html" class="dashboard-nav-item-button"><i class="fa-solid fa-chart-pie"></i> Reports</a>
+
+        <a href="{% url 'therapist_dashboard' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/dashboard/' %}active{% endif %}">
+            <i class="fa-brands fa-dashcube"></i> Dashboard
+        </a>
+
+        <a href="{% url 'therapist_patients' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/patients/' %}active{% endif %}">
+            <i class="fa-solid fa-users"></i> Patients
+        </a>
+
+        <a href="{% url 'session_entry' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/session-entry/' %}active{% endif %}">
+            <i class="fa-solid fa-file-medical"></i> Session Entry
+        </a>
+
+        <a href="{% url 'therapist_inventory' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/inventory/' %}active{% endif %}">
+            <i class="fa-solid fa-flask"></i> Inventory
+        </a>
+
+        <a href="{% url 'therapist_reports' %}" 
+           class="dashboard-nav-item-button {% if request.path == '/therapist/reports/' %}active{% endif %}">
+            <i class="fa-solid fa-chart-pie"></i> Reports
+        </a>
+        <a href="{% url 'therapist_teleconsult' %}"
+   class="dashboard-nav-item-button {% if request.path == '/therapist/teleconsult/' %}active{% endif %}">
+   <i class="fa-solid fa-video"></i> Teleconsult
+</a>
+
+
     </div>
+
     <div class="dashboard-nav-profile-section">
         <div style="display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.2);padding:6px 15px 6px 6px;border-radius:30px;border:1px solid rgba(255,215,0,0.2);">
-            <div style="width:32px;height:32px;background:var(--theme-gold);color:var(--theme-brown);font-weight:700;border-radius:50%;display:flex;justify-content:center;align-items:center;">DR</div>
-            <div style="font-size:0.9rem;color:white;font-weight:600;">Dr. Ananya</div>
+            <div style="width:32px;height:32px;background:var(--theme-gold);color:var(--theme-brown);font-weight:700;border-radius:50%;display:flex;justify-content:center;align-items:center;">
+                DR
+            </div>
+            <div style="font-size:0.9rem;color:white;font-weight:600;">{{ therapist.name }}</div>
         </div>
     </div>
 </nav>
@@ -89,39 +122,44 @@
 <div class="dashboard-main-container">
     <h1>Session Entry</h1>
 
-    <div class="dashboard-content-card" style="margin-top:20px;">
-        <label>Patient Name</label>
-        <select class="form-input">
-            <option>-- Select Patient --</option>
-            <option>Aniket Sharma</option>
-            <option>Rahul Verma</option>
-            <option>Priya Singh</option>
-        </select>
+    <form method="POST" action="{% url 'save_session' %}">
+        {% csrf_token %}
+        
+        <div class="dashboard-content-card" style="margin-top:20px;">
+            
+            <!-- PATIENT -->
+       <!-- PATIENT NAME - typed input -->
+<label>Patient Name</label>
+<input type="text" name="patient_name" class="form-input"
+       placeholder="Type patient name..." required>
 
-        <label>Therapy Performed</label>
-        <select class="form-input">
-            <option>Shirodhara</option>
-            <option>Abhyanga</option>
-            <option>Nasya</option>
-        </select>
+<!-- THERAPY - typed input -->
+<label>Therapy Performed</label>
+<input type="text" name="therapy_name" class="form-input"
+       placeholder="Type therapy name..." required>
 
-        <label>Session Notes</label>
-        <textarea class="form-input" rows="4" placeholder="Observations, patient feedback..."></textarea>
 
-        <label>Inventory Used</label>
-        <select class="form-input">
-            <option>Sesame Oil</option>
-            <option>Ashwagandha</option>
-            <option>Brahmi Powder</option>
-        </select>
+            <!-- NOTES -->
+            <label>Session Notes</label>
+            <textarea name="notes" class="form-input" rows="4" placeholder="Observations..." required></textarea>
 
-        <input type="number" class="form-input" placeholder="Qty" style="width:120px;">
+            <!-- INVENTORY -->
+            <label>Inventory Used</label>
+            <select name="inventory_item" class="form-input">
+                <option value="Sesame Oil">Sesame Oil</option>
+                <option value="Ashwagandha">Ashwagandha</option>
+                <option value="Brahmi Powder">Brahmi Powder</option>
+            </select>
 
-        <div style="text-align:right;">
-            <button class="btn-primary">Save Session Note</button>
+            <input type="number" name="inventory_qty" class="form-input" placeholder="Qty" style="width:120px;">
+
+            <div style="text-align:right;">
+                <button type="submit" class="btn-primary">Save Session Note</button>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
+
 
 </body>
 </html>
