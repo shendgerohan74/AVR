@@ -1,201 +1,346 @@
 {% extends "patient-portal/base.html" %}
-
 {% load static %}
 
 {% block progress %}active{% endblock progress %}
-
 {% block title %}Therapy Progress{% endblock title %}
-        
 
 {% block style %}
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static "css/patient-portal/progress.css" %}">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<!-- Fonts (already in base, keep if needed) -->
+<link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap"
+    rel="stylesheet">
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Page CSS -->
+<link rel="stylesheet" href="{% static 'css/patient-portal/progress.css' %}">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock style %}
-
 
 {% block content %}
 
-    <!-- MAIN CONTENT -->
-    <div class="progress-main-container">
-        
-        <div class="progress-page-header">
-            <h1 class="progress-page-title">Your Recovery Progress</h1>
-        </div>
+<div class="progress-main-container">
 
-        <div class="progress-grid-layout">
-            
-            <!-- 1. SYMPTOM SCORE TREND CHART -->
-            <div class="progress-content-card">
-                <div class="progress-card-header">
-                    <i class="fas fa-chart-line" style="color:var(--theme-gold-dark)"></i> Symptom Score Trend
-                </div>
-                <div class="progress-chart-wrapper">
-                    <canvas id="symptomChart"></canvas>
-                </div>
-            </div>
-
-            <!-- 2. OBJECTIVE MEASUREMENTS -->
-            <div class="progress-content-card">
-                <div class="progress-card-header">
-                    <i class="fas fa-heartbeat" style="color:var(--theme-gold-dark)"></i> Objective Measurements
-                </div>
-                
-                <div class="progress-stats-grid">
-                    <!-- BP Widget -->
-                    <div class="progress-stat-box">
-                        <div class="progress-stat-icon"><i class="fas fa-tint"></i></div>
-                        <div class="progress-stat-info">
-                            <h5>Blood Pressure</h5>
-                            <div class="progress-stat-value" id="val-bp">--/--</div>
-                            <span class="progress-stat-unit">mmHg (Normal)</span>
-                        </div>
-                    </div>
-
-                    <!-- Stress Widget -->
-                    <div class="progress-stat-box">
-                        <div class="progress-stat-icon"><i class="fas fa-brain"></i></div>
-                        <div class="progress-stat-info">
-                            <h5>Stress Level</h5>
-                            <div class="progress-stat-value" id="val-stress">--</div>
-                            <span class="progress-stat-unit">Scale of 1-10</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. AUTO-GENERATED REPORTS -->
-            <div class="progress-content-card">
-                <div class="progress-card-header">
-                    <i class="fas fa-file-medical-alt" style="color:var(--theme-gold-dark)"></i> Auto-generated Reports
-                </div>
-                
-                <div class="progress-report-container">
-                    <div class="progress-report-info">
-                        <h4>Weekly Health Summary</h4>
-                        <p>Generated on <span id="report-date">--</span> based on your daily logs.</p>
-                    </div>
-                    <button class="progress-download-btn" onclick="downloadReport()">
-                        <i class="fas fa-download"></i> Download PDF
-                    </button>
-                </div>
-            </div>
-
-        </div>
+    <!-- PAGE HEADER -->
+    <div class="progress-page-header">
+        <h1 class="progress-page-title">Your Recovery Progress</h1>
+        <p class="progress-page-subtitle">
+            Daily scores are recorded by you. Session metrics are recorded by your therapist.
+        </p>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // --- 1. INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchProgressData();
-            
-            // Header User Logic (Mock if needed)
-            const user = { name: "Aniket" };
-            document.getElementById('header-name').textContent = user.name;
-            document.getElementById('header-initial').textContent = user.name.charAt(0);
+    <div class="progress-grid-layout">
+
+        <!-- 1. PATIENT SELF-REPORTED TREND CHART -->
+        <div class="progress-content-card">
+            <div class="progress-card-header">
+                <i class="fas fa-chart-line" style="color:var(--theme-gold-dark)"></i>
+                Symptom Trend (Self Reported)
+            </div>
+            <div class="progress-chart-wrapper">
+                <canvas id="symptomChart"></canvas>
+                <div id="chart-empty-state" class="progress-empty-state" style="display:none;">
+                    No self-check entries yet. Submit today’s scores to see your graph.
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SELF-CHECK + THERAPIST METRICS -->
+        <div class="progress-content-card">
+            <div class="progress-card-header">
+                <i class="fas fa-user-check" style="color:var(--theme-gold-dark)"></i>
+                Today’s Self Check & Therapist Summary
+            </div>
+
+            <!-- Self-check form (patient input) -->
+            <!-- Self Check Section -->
+            <div class="progress-content-card">
+                <div class="progress-card-header">
+                    <i class="fas fa-user-check" style="color:var(--theme-gold-dark)"></i>
+                    Today’s Self Check
+                </div>
+
+                <form class="progress-form">
+                    <label>Pain Level (0–10)</label>
+                    <input id="input-pain" type="number" min="0" max="10" class="progress-input">
+
+                    <label>Stress Level (0–10)</label>
+                    <input id="input-stress" type="number" min="0" max="10" class="progress-input">
+
+                    <label>Sleep Quality (0–10)</label>
+                    <input id="input-sleep" type="number" min="0" max="10" class="progress-input">
+
+                    <button class="progress-submit-btn" onclick="saveSelfCheck()">
+                        <i class="fas fa-save"></i> Save Today’s Check-in
+                    </button>
+
+                </form>
+            </div>
+
+
+            <hr class="progress-divider">
+
+            <!-- Therapist recorded summary -->
+            <div class="progress-therapist-section">
+                <h4 class="progress-section-title">
+                    Latest Therapist Session
+                </h4>
+
+                <p class="progress-meta">
+                    Last updated: <span id="therapist-date">--</span>
+                </p>
+
+                <div class="progress-stats-grid">
+
+                    <div class="progress-stat-box">
+                        <h5>Mobility Score</h5>
+                        <div class="progress-stat-value" id="val-mobility">--</div>
+                        <span class="progress-stat-unit">0–10 (Therapist)</span>
+                    </div>
+
+                    <div class="progress-stat-box">
+                        <h5>Session Pain Score</h5>
+                        <div class="progress-stat-value" id="val-session-pain">--</div>
+                        <span class="progress-stat-unit">0–10 (Therapist)</span>
+                    </div>
+
+                    <div class="progress-stat-box">
+                        <h5>Overall Remark</h5>
+                        <div class="progress-stat-value small-text" id="val-remark">
+                            No session recorded yet.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. AUTO-GENERATED REPORT -->
+        <div class="progress-content-card">
+            <div class="progress-card-header">
+                <i class="fas fa-file-medical-alt" style="color:var(--theme-gold-dark)"></i>
+                Progress Report
+            </div>
+
+            <div class="progress-report-container">
+                <div class="progress-report-info">
+                    <h4>Combined Progress Summary</h4>
+                    <p>
+                        This report combines your daily self-check scores with therapist session data.
+                        Last generated on <span id="report-date">--</span>.
+                    </p>
+                    <p id="report-summary" class="progress-report-summary">
+                        Report will appear here once enough data is recorded.
+                    </p>
+                </div>
+
+                <button class="progress-download-btn" onclick="downloadReport()">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProgressData();
+    });
+
+    async function loadProgressData() {
+        try {
+            const res = await fetch('/api/patient/progress/', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!res.ok) {
+                console.warn('Progress API error, status:', res.status);
+                showEmptyStates();
+                return;
+            }
+
+            const data = await res.json();
+            renderSelfTrend(data.patient_daily);
+            renderTherapistSection(data.therapist_session);
+            renderReport(data.report);
+
+        } catch (err) {
+            console.error('Progress API failed:', err);
+            showEmptyStates();
+        }
+    }
+
+    function renderSelfTrend(patientDaily) {
+        const chartContainer = document.getElementById('symptomChart');
+        const emptyState = document.getElementById('chart-empty-state');
+
+        if (!patientDaily || !patientDaily.labels || patientDaily.labels.length === 0) {
+            if (chartContainer) chartContainer.style.display = 'none';
+            if (emptyState) emptyState.style.display = 'block';
+            return;
+        }
+
+        if (emptyState) emptyState.style.display = 'none';
+        if (chartContainer) chartContainer.style.display = 'block';
+
+        const ctx = chartContainer.getContext('2d');
+
+        if (window.symptomChart) {
+            window.symptomChart.destroy();
+        }
+        window.symptomChart = new Chart(ctx, {
+
+            type: 'line',
+            data: {
+                labels: patientDaily.labels,
+                datasets: [
+                    {
+                        label: 'Pain (Self)',
+                        data: patientDaily.pain || [],
+                        borderColor: '#78350f',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3,
+                    },
+                    {
+                        label: 'Stress (Self)',
+                        data: patientDaily.stress || [],
+                        borderColor: '#C8A300',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3,
+                    },
+                    {
+                        label: 'Sleep (Self)',
+                        data: patientDaily.sleep || [],
+                        borderColor: '#2E7D32',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3,
+                    },
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        title: {
+                            display: true,
+                            text: 'Score (0–10)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    async function saveSelfCheck() {
+        const payload = {
+            pain: document.getElementById("input-pain").value,
+            stress: document.getElementById("input-stress").value,
+            sleep: document.getElementById("input-sleep").value
+        };
+
+        const res = await fetch("/api/patient/progress/save/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
         });
 
-        // --- 2. FETCH DATA (BACKEND CONNECTION) ---
-        async function fetchProgressData() {
-            
-            // Default Fallback Data
-            let data = {
-                measurements: { bp: "120/80", stress: 4 },
-                chart: { labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"], scores: [8, 7, 5, 4, 2] },
-                reportDate: new Date().toLocaleDateString()
-            };
-
-            try {
-                // 🟢 CONNECT TO BACKEND
-                const response = await fetch('/api/patient/progress/', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // 'X-CSRFToken': getCookie('csrftoken') // Use if needed
-                    }
-                });
-
-                if (response.ok) {
-                    const backendData = await response.json();
-                    data = backendData; // Use backend data if successful
-                    console.log("Data loaded from Backend");
-                } else {
-                    console.warn("Backend not reachable, using Mock Data");
-                }
-
-            } catch (error) {
-                console.error("Connection failed:", error);
-            }
-
-            // Render with whatever data we have (Backend or Mock)
-            renderPage(data);
+        if (res.ok) {
+            alert("Saved!");
+            loadProgressData();
+        } else {
+            alert("Error saving");
         }
+    }
 
-        // --- 3. RENDER UI ---
-        function renderPage(data) {
-            // Measurements
-            document.getElementById('val-bp').textContent = data.measurements.bp || "--/--";
-            document.getElementById('val-stress').textContent = data.measurements.stress || "--";
-            document.getElementById('report-date').textContent = data.reportDate || "Today";
 
-            // Chart
-            if (data.chart) {
-                initChart(data.chart);
-            }
-        }
+    function renderTherapistSection(session) {
+        document.getElementById('therapist-date').textContent =
+            (session && session.date) || '--';
 
-        function initChart(chartData) {
-            const ctx = document.getElementById('symptomChart').getContext('2d');
-            
-            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(120, 53, 15, 0.2)'); 
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        document.getElementById('val-mobility').textContent =
+            (session && session.mobility_score != null) ? session.mobility_score : '--';
 
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: chartData.labels,
-                    datasets: [{
-                        label: 'Average Symptom Severity (0-10)',
-                        data: chartData.scores,
-                        borderColor: '#78350f', 
-                        backgroundColor: gradient,
-                        borderWidth: 3,
-                        pointBackgroundColor: '#FFD700',
-                        pointBorderColor: '#78350f',
-                        pointRadius: 5,
-                        fill: true,
-                        tension: 0.4
-                    }]
+        document.getElementById('val-session-pain').textContent =
+            (session && session.pain_score != null) ? session.pain_score : '--';
+
+        document.getElementById('val-remark').textContent =
+            (session && session.remark) ? session.remark : 'No therapist notes yet.';
+    }
+
+    function renderReport(report) {
+        document.getElementById('report-date').textContent =
+            (report && report.last_updated) || '--';
+
+        document.getElementById('report-summary').textContent =
+            (report && report.summary) || 'Report will appear here once enough data is recorded.';
+    }
+
+    function showEmptyStates() {
+        const emptyState = document.getElementById('chart-empty-state');
+        const canvas = document.getElementById('symptomChart');
+        if (canvas) canvas.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'block';
+    }
+
+    async function submitSelfCheck(ev) {
+        ev.preventDefault();
+
+        const msgEl = document.getElementById('selfcheck-message');
+        msgEl.textContent = '';
+        msgEl.classList.remove('error', 'success');
+
+        const payload = {
+            pain: Number(document.getElementById('input-pain').value),
+            stress: Number(document.getElementById('input-stress').value),
+            sleep: Number(document.getElementById('input-sleep').value),
+        };
+
+        try {
+            const res = await fetch('/api/patient/progress/daily-log/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top' } },
-                    scales: {
-                        y: {
-                            beginAtZero: true, max: 10,
-                            title: { display: true, text: 'Severity Score' },
-                            grid: { borderDash: [5, 5], color: '#e0e0e0' }
-                        },
-                        x: { grid: { display: false } }
-                    }
-                }
+                body: JSON.stringify(payload),
             });
-        }
 
-        // --- 4. ACTIONS ---
-        function downloadReport() {
-            // Trigger backend PDF generation
-            window.location.href = '/api/patient/progress/download/';
-        }
-    </script>
+            if (!res.ok) {
+                msgEl.textContent = 'Could not save your scores. Try again.';
+                msgEl.classList.add('error');
+                return;
+            }
 
-{% endblock content %}  
+            msgEl.textContent = 'Self-check saved. Updating chart...';
+            msgEl.classList.add('success');
+            loadProgressData();
+
+        } catch (err) {
+            console.error(err);
+            msgEl.textContent = 'Something went wrong. Please try again.';
+            msgEl.classList.add('error');
+        }
+    }
+
+    // Standard CSRF helper
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    function downloadReport() {
+        window.location.href = '/api/patient/progress/download/';
+    }
+</script>
+
+{% endblock content %}

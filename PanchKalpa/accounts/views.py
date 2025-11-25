@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib import messages
 from Patient.models import PatientProfile
+from therapist.models import Therapist  
 
 
 
@@ -69,38 +70,51 @@ def signup_view(request):
 
     return render(request, "accounts/login.html")
 
-
 def login_view(request):
     if request.method == "POST":
 
         email = request.POST.get("email")
         password = request.POST.get("password")
 
-        user = authenticate(username=email, password=password)
+        # ✅ Authenticate by email
+        try:
+            user_obj = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "Invalid email or password")
+            return redirect('login')
+
+        user = authenticate(username=user_obj.username, password=password)
 
         if user is None:
             messages.error(request, "Invalid email or password")
             return redirect("login")
 
-        # Login user
         login(request, user)
 
-        # SUPERUSER → admin
-        if user.is_superuser:
-            return redirect("/admin/")
-
-        # PATIENT → dashboard
-        try:
-            patient = user.patientprofile
-            return redirect("patient-dashboard")     # 🚀 named URL
-        except PatientProfile.DoesNotExist:
-            pass
-
-        # THERAPIST → dashboard (only if model exists)
-        if hasattr(user, "therapistprofile"):
+        # ✅ CHECK THERAPIST USING THERAPIST TABLE
+        if Therapist.objects.filter(email=email).exists():
             return redirect("therapist-dashboard")
 
-        # DEFAULT → patient dashboard
+        # ✅ OTHERWISE PATIENT
         return redirect("patient-dashboard")
 
     return render(request, "accounts/login.html")
+
+
+# Therapists Login
+
+def therapist_login(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        user = authenticate(username=email, password=password)
+
+        if user is None or not hasattr(user, 'therapistprofile'):
+            messages.error(request, "Invalid therapist credentials")
+            return redirect("therapist-login")
+
+        login(request, user)
+        return redirect("therapist-dashboard")
+
+    return render(request, "therapist/therapist_login.html")
