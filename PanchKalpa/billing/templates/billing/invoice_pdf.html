@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            background: #ffffff;
+            padding: 40px;
+            margin: 0;
+            color: #2A241F;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 55px;
+        }
+
+        .invoice-text {
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #4e342e;
+        }
+
+        .line {
+            margin: 25px 0;
+            border-top: 1px solid #E7DCC8;
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: #6b5f5a;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th {
+            font-size: 13px;
+            color: #6b5f5a;
+            text-align: left;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #E7DCC8;
+        }
+
+        td {
+            padding: 10px 0;
+            font-size: 15px;
+            border-bottom: 1px solid #F3EEE6;
+        }
+
+        .total-label {
+            font-weight: 600;
+        }
+
+        .total-amount {
+            font-weight: 600;
+            color: #4e342e;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 11px;
+            color: #8a807b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP HEADER -->
+    <div class="top">
+        <img src="{{ logo_url }}" class="logo" alt="Panchkalpa Logo">
+        <div class="invoice-text">INVOICE</div>
+    </div>
+
+    <div class="line"></div>
+
+    <!-- INVOICE DETAILS -->
+    <div>
+        <div class="section-title">Invoice ID</div>
+        <div class="value">#{{ invoice.id }}</div>
+
+        <div class="section-title">Date</div>
+        <div class="value">{{ invoice.created_at|date:"d M, Y" }}</div>
+    </div>
+
+    <div class="line"></div>
+
+    <!-- PATIENT INFO -->
+    <div>
+        <div class="section-title">Billed To</div>
+        <div class="value">
+            {{ invoice.patient.first_name }} {{ invoice.patient.last_name }}<br>
+            {{ invoice.patient.email }}
+        </div>
+    </div>
+
+    <div class="line"></div>
+
+    <!-- BILL TABLE -->
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Amount (₹)</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>{{ invoice.description }}</td>
+                <td>{{ invoice.amount }}</td>
+            </tr>
+            <tr>
+                <td class="total-label">Total</td>
+                <td class="total-amount">₹{{ invoice.amount }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Thank you for choosing Panchkalpa Ayurveda 🌿
+    </div>
+
+</body>
+</html>

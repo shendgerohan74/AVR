@@ -95,5 +95,5 @@ def progress(request):
     return render(request, "patient-portal/progress.html")
 
 
-def billing(request):
-    return render(request, "patient-portal/billing.html")
+# def billing(request):
+#     return render(request, "patient-portal/billing.html")

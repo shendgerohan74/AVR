@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'Patient',
     'therapist',
     'progress',
+    'billing',
 
 ]
 
@@ -138,3 +139,13 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://localhost:8000'
 ]
+
+
+# Payment Gateway
+
+RAZORPAY_KEY_ID = "rzp_test_RjrCJbmWDsjiPI"
+RAZORPAY_KEY_SECRET = "4zIMu206f42cKE1IZ5HVddvT"
+
+# Optional: for Stripe
+# STRIPE_SECRET_KEY = "sk_test_xxx"
+# STRIPE_PUBLISHABLE_KEY = "pk_test_yyy"

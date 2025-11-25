@@ -24,4 +24,8 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('patient/', include('Patient.urls')),
     path('progress/', include('progress.urls')),
+    path("billing/", include("billing.urls", namespace="billing")),
+    # path("patient/billing/", include("billing.urls", namespace="billing")),
+
+
 ]

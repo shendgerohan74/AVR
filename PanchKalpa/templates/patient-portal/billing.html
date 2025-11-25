@@ -6,87 +6,110 @@
 {% block title %}Billing & Payments{% endblock title %}
 
 {% block style %}
-    <link rel="stylesheet" href="{% static 'css/patient-portal/billing.css' %}">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/patient-portal/billing.css' %}">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 {% endblock style %}
 
 {% block content %}
+<!-- Pending Bills -->
+<div class="billing-content-card">
+    <div class="billing-card-header">
+        <i class="fas fa-file-invoice-dollar"></i> Pending Bills
+    </div>
 
-    <div class="billing-main-container">
+    {% for bill in pending %}
+<div class="billing-pending-item">
+    <div class="billing-info-group">
+        <h4>Invoice #{{ bill.id }}</h4>
+        <p>{{ bill.description }}</p>
+    </div>
 
-        <div class="billing-page-header">
-            <h1 class="billing-page-title">Billing & Payments</h1>
-        </div>
-
-        <!-- Pending Bills -->
-        <div class="billing-content-card">
-            <div class="billing-card-header">
-                <i class="fas fa-file-invoice-dollar"></i> Pending Bills
-            </div>
-
-            <div class="billing-pending-list">
-                {% if pending %}
-                    {% for bill in pending %}
-                        <div class="billing-pending-item">
-                            <div class="billing-info-group">
-                                <h4>Invoice #{{ bill.invoice_id }}</h4>
-                                <p>{{ bill.therapy }}</p>
-                            </div>
-
-                            <div class="billing-amount-box">
-                                <span class="billing-price">₹{{ bill.amount }}</span>
-                                <a href="{% url 'pay_bill' bill.invoice_id %}" class="billing-pay-btn">
-                                    Pay Now <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="billing-empty-state">No pending bills ,right now</div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Payment History -->
-        <div class="billing-content-card">
-            <div class="billing-card-header">
-                <i class="fas fa-history"></i> Payment History
-            </div>
-
-            <table class="billing-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Invoice ID</th>
-                        <th>Description</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                {% if history %}
-                    {% for bill in history %}
-                    <tr>
-                        <td>{{ bill.date }}</td>
-                        <td>#{{ bill.invoice_id }}</td>
-                        <td>{{ bill.therapy }}</td>
-                        <td>₹{{ bill.amount }}</td>
-                        <td><span class="billing-status-badge status-paid">Paid</span></td>
-                    </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="5" class="billing-empty-state">No payment history</td>
-                    </tr>
-                {% endif %}
-                </tbody>
-
-            </table>
-        </div>
+    <div class="billing-amount-box">
+        <span class="billing-price">₹{{ bill.amount }}</span>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <a href="javascript:void(0)" onclick="payNow('{{ bill.id }}')" class="billing-pay-btn">
+            Pay Now <i class="fas fa-chevron-right"></i>
+        </a>
 
     </div>
+</div>
+{% endfor %}
+
+</div>
+
+
+<!-- Payment History -->
+<div class="billing-content-card">
+    <div class="billing-card-header">
+        <i class="fas fa-history"></i> Payment History
+    </div>
+
+    <table class="billing-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Invoice ID</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% if history %}
+                {% for bill in history %}
+                <tr>
+                    <td>{{ bill.created_at|date:"d M Y" }}</td>
+                    <td>#{{ bill.id }}</td>
+                    <td>{{ bill.description }}</td>
+                    <td>₹{{ bill.amount }}</td>
+                    <td>
+                        {% if bill.status == "paid" %}
+                            <a href="{% url 'billing:download-invoice' bill.id %}" class="billing-pay-btn">
+                                Download <i class="fa fa-download"></i>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="billing-empty-state">No payment history</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+function payNow(invoiceId) {
+    fetch(`/billing/order/${invoiceId}/`)
+        .then(res => res.json())
+        .then(data => {
+
+            var options = {
+                "key": data.key,
+                "amount": data.amount,
+                "currency": "INR",
+                "name": "Panchkalpa Ayurveda",
+                "description": "Invoice Payment",
+                "order_id": data.order_id,
+
+                "handler": function (response) {
+                    window.location.href = `/billing/success/?invoice_id=${invoiceId}`;
+                }
+            };
+
+            var rzp = new Razorpay(options);
+            rzp.open();
+        })
+        .catch(err => console.error(err));
+}
+</script>
+
 
 {% endblock content %}
