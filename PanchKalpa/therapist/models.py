@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
+
 
 
 class Therapist(models.Model):
@@ -25,3 +27,10 @@ class Therapy(models.Model):
     def __str__(self):
         return self.name
 
+
+class TherapistProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="therapistprofile")
+    date_of_birth = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.user.get_full_name() or self.user.username

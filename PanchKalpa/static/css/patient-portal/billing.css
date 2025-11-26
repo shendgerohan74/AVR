@@ -173,6 +173,8 @@ h4 {
     box-shadow: var(--theme-shadow);
     border: 1px solid rgba(255, 215, 0, 0.2);
     margin-bottom: 30px;
+    width: 75vw;
+    justify-self: center;
 }
 
 .billing-card-header {

@@ -316,3 +316,53 @@ h5 {
     margin-top: 4px;
     display: block;
 }
+
+/* HAMBURGER BUTTON */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 10px;
+}
+
+/* MOBILE MENU PANEL */
+.mobile-menu-panel {
+    position: fixed;
+    top: var(--theme-nav-height);
+    right: 0;
+    width: 260px;
+    background: var(--theme-brown);
+    padding: 20px 15px;
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.25);
+    z-index: 3000;
+}
+
+.mobile-menu-panel a {
+    color: #ffffffdd;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    font-size: 1rem;
+}
+
+.mobile-menu-panel a:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* ENABLE MOBILE MENU */
+@media (max-width: 768px) {
+    .dashboard-nav-links-group {
+        display: none !important;
+    }
+    .mobile-menu-toggle {
+        display: block;
+    }
+}

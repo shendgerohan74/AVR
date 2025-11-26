@@ -1,0 +1,150 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Therapist Teleconsult | Panchkalpa</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+body { margin:0; font-family:'Lato',sans-serif; background:#fff7e5; }
+
+/* Video Box */
+#remoteVideo {
+    width: 100%; height: 60vh; background: #000;
+    border-radius: 12px; margin-bottom:10px; position:relative;
+}
+#callStatus {
+    color:#fff; font-size:22px; position:absolute;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+}
+.video-controls {
+    display:flex; gap:15px; justify-content:center;
+}
+.video-btn {
+    background:#78350f; border:none; color:#fff; padding:12px;
+    width:55px; border-radius:50px; font-size:18px; cursor:pointer;
+}
+.video-btn:hover { background:#5b280b; }
+.join-btn { background:#1ea83c !important; width:auto; padding:12px 24px; }
+
+/* CHAT UI */
+.chat-box {
+    background:white; border-radius:12px; padding:18px;
+    height:250px; overflow-y:auto; box-shadow:0 0 10px rgba(0,0,0,0.08);
+}
+.msg-sent {
+    background:#d5e8ff; padding:10px 14px; border-radius:12px;
+    margin:6px 0; text-align:right;
+}
+.msg-received {
+    background:#fbe2c1; padding:10px 14px; border-radius:12px;
+    margin:6px 0; text-align:left;
+}
+.msg-time { font-size:0.7rem; opacity:.6; display:block; margin-top:4px; }
+
+.chat-input-area {
+    display:flex; margin-top:8px; gap:8px;
+}
+.chat-input { flex:1; padding:10px; border-radius:8px; border:1px solid #ccc; }
+.send-btn {
+    background:#78350f; border:none; color:white; border-radius:8px;
+    padding:10px 18px; cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+<h2 style="text-align:center; color:#78350f; margin:15px 0; font-family:'Playfair Display'">
+    Teleconsultation - {{ therapist.name }}
+</h2>
+
+<!-- ⬇️ VIDEO -->
+<div id="remoteVideo">
+    <div id="callStatus">Waiting for patient to join...</div>
+</div>
+
+<div class="video-controls">
+    <button class="video-btn" onclick="toggleMic()"><i class="fas fa-microphone"></i></button>
+    <button class="video-btn" onclick="toggleVideo()"><i class="fas fa-video"></i></button>
+    <button class="video-btn join-btn" onclick="startJitsiCall()">Join Call</button>
+</div>
+
+<br>
+
+<!-- ⬇️ CHAT -->
+<div class="chat-box" id="chatContainer"></div>
+
+<div class="chat-input-area">
+    <input type="text" id="msgInput" class="chat-input" placeholder="Type a message…" onkeypress="handleEnter(event)">
+    <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+</div>
+
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+let api = null;
+let muted = false;
+let videoOff = false;
+
+const CSRF = "{{ csrf_token }}";
+const THERAPIST_ID = "{{ therapist.id }}";
+
+// ⭐ Patient username via ?user=
+const patientUsername = new URLSearchParams(window.location.search).get("user");
+
+// ⭐ Jitsi Video Join
+function startJitsiCall() {
+    if (!patientUsername) return alert("⚠ Missing ?user=username in URL!");
+    api = new JitsiMeetExternalAPI("meet.jit.si", {
+        roomName: "PanchkalpaTele_" + patientUsername,
+        parentNode: document.querySelector("#remoteVideo"),
+        width: "100%", height: "100%",
+        userInfo: { displayName: "{{ therapist.name }}" }
+    });
+    api.addEventListener("videoConferenceJoined", () => {
+        document.getElementById("callStatus").style.display = "none";
+    });
+}
+
+function toggleMic() { if(api) api.executeCommand("toggleAudio"); }
+function toggleVideo() { if(api) api.executeCommand("toggleVideo"); }
+
+// ⭐ Send Chat
+function sendMessage() {
+    const msg = document.getElementById("msgInput").value.trim();
+    if (!msg) return;
+    fetch("/chat/send/", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json", "X-CSRFToken":CSRF },
+        body:JSON.stringify({ message:msg, therapist_id:THERAPIST_ID })
+    });
+    document.getElementById("msgInput").value = "";
+}
+
+// ⭐ Load Chat Every 1 sec
+function loadMessages() {
+    fetch(`/chat/get/${THERAPIST_ID}/`)
+    .then(r => r.json())
+    .then(data => {
+        let box = document.getElementById("chatContainer");
+        box.innerHTML = "";
+        data.forEach(m => {
+            box.innerHTML += `
+                <div class="${m.sender === 'therapist' ? 'msg-sent' : 'msg-received'}">
+                    ${m.message}
+                    <span class="msg-time">${m.time}</span>
+                </div>`;
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+setInterval(loadMessages, 1000);
+function handleEnter(e){ if(e.key==="Enter") sendMessage(); }
+</script>
+
+</body>
+</html>
