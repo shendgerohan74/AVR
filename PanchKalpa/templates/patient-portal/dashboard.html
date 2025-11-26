@@ -166,8 +166,8 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
-        fetch("/api/patient/progress/")
-
+        fetch("/progress/api/patient/progress/")
+            .then(res => res.json())
             .then(data => {
                 const ctx = document.getElementById("progressChart");
 

@@ -5,23 +5,25 @@ from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-
+import razorpay
 from .models import Invoice
 
 
 # -----------------------------
 # BILLING HOME PAGE
 # -----------------------------
-
 @login_required
 def billing_home(request):
     print("✅ USING BILLING HOME VIEW")
 
-    pending = Invoice.objects.filter(patient=request.user, status="issued")
-    history = Invoice.objects.filter(patient=request.user, status="paid")
+    patient = request.user.patientprofile
+
+    pending = Invoice.objects.filter(patient=patient, status="issued")
+    history = Invoice.objects.filter(patient=patient, status="paid")
 
     print("\n================ DEBUG BILLING ================")
     print("LOGGED USER:", request.user, request.user.email)
+    print("PATIENT PROFILE:", patient)
     print("PENDING:", list(pending))
     print("HISTORY:", list(history))
     print("===============================================\n")
@@ -34,31 +36,28 @@ def billing_home(request):
 # -----------------------------
 # CREATE RAZORPAY ORDER
 # -----------------------------
+
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
 @login_required
 def create_order(request, invoice_id):
-    invoice = get_object_or_404(Invoice, pk=invoice_id, patient=request.user)
+    patient = request.user.patientprofile  # ✅ FIXED
 
-    client = razorpay.Client(auth=(
-        settings.RAZORPAY_KEY_ID,
-        settings.RAZORPAY_KEY_SECRET
-    ))
+    invoice = Invoice.objects.get(id=invoice_id, patient=patient)  # ✅ FIXED
 
-    order_data = {
-        "amount": int(invoice.amount * 100),
+    amount = int(invoice.amount * 100)  # ✅ Razorpay expects paise
+
+    order = razorpay_client.order.create({
+        "amount": amount,
         "currency": "INR",
-        "receipt": f"INV-{invoice.id}",
-    }
-
-    order = client.order.create(order_data)
-
-    return JsonResponse({
-        "order_id": order["id"],
-        "key": settings.RAZORPAY_KEY_ID,
-        "amount": int(invoice.amount * 100),
-        "customer": str(request.user),
-        "invoice_id": invoice.id,  # returning actual ID
+        "payment_capture": 1,
     })
 
+    return JsonResponse({
+        "key": settings.RAZORPAY_KEY_ID,
+        "amount": amount,
+        "order_id": order["id"]
+    })
 
 # -----------------------------
 # PAYMENT SUCCESS HANDLER
@@ -67,7 +66,7 @@ def create_order(request, invoice_id):
 def payment_success(request):
     invoice_id = request.GET.get("invoice_id")
 
-    invoice = get_object_or_404(Invoice, pk=invoice_id, patient=request.user)
+    invoice = get_object_or_404(Invoice, pk=invoice_id, patient=request.user.patientprofile)
 
     invoice.status = "paid"
     invoice.save()
@@ -80,7 +79,7 @@ def payment_success(request):
 # -----------------------------
 @login_required
 def download_invoice(request, invoice_id):
-    invoice = get_object_or_404(Invoice, pk=invoice_id, patient=request.user)
+    invoice = get_object_or_404(Invoice, pk=invoice_id, patient=request.user.patientprofile)
 
     template = get_template("billing/invoice_pdf.html")
     html = template.render({"invoice": invoice})

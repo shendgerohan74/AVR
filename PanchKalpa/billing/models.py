@@ -8,27 +8,60 @@ User = settings.AUTH_USER_MODEL
 
 
 
-class Invoice(models.Model):
-    STATUS_CHOICES = [
-        ("draft", "Draft"),
-        ("issued", "Issued"),
-        ("paid", "Paid"),
-        ("cancelled", "Cancelled"),
-    ]
+from Patient.models import PatientProfile
 
-    patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invoices")
+class Invoice(models.Model):
+    patient = models.ForeignKey(
+        PatientProfile,
+        on_delete=models.CASCADE,
+        related_name="invoices"
+    )
     invoice_id = models.CharField(max_length=30, unique=True, default="temp")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     due_date = models.DateField(null=True, blank=True)
+
+    STATUS_CHOICES = [
+        ("draft", "Draft"),
+        ("issued", "Issued"),
+        ("paid", "Paid"),
+        ("cancelled", "Cancelled"), 
+    ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="issued")
 
-    # optional link to appointment (if you want)
-    appointment = models.ForeignKey("Patient.Appointment", null=True, blank=True, on_delete=models.SET_NULL)
+    appointment = models.ForeignKey(
+        "Patient.Appointment",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
 
     def __str__(self):
-        return f"Invoice #{self.id} — {self.patient} — {self.amount}"
+        return f"Invoice #{self.id} — {self.patient.user.username} — {self.amount}"
+
+
+# class Invoice(models.Model):
+#     STATUS_CHOICES = [
+#         ("draft", "Draft"),
+#         ("issued", "Issued"),
+#         ("paid", "Paid"),
+#         ("cancelled", "Cancelled"),
+#     ]
+
+#     patient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="invoices")
+#     invoice_id = models.CharField(max_length=30, unique=True, default="temp")
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     description = models.TextField(blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     due_date = models.DateField(null=True, blank=True)
+#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="issued")
+
+#     # optional link to appointment (if you want)
+#     appointment = models.ForeignKey("Patient.Appointment", null=True, blank=True, on_delete=models.SET_NULL)
+
+#     def __str__(self):
+#         return f"Invoice #{self.id} — {self.patient} — {self.amount}"
 
 class Payment(models.Model):
     GATEWAY_CHOICES = [

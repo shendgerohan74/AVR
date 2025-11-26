@@ -33,7 +33,7 @@
                 
                 <div class="billing-amount-box">
                     <span class="billing-price">₹{{ bill.amount }}</span>
-                    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                    
                     <a href="javascript:void(0)" onclick="payNow('{{ bill.id }}')" class="billing-pay-btn">
                         Pay Now <i class="fas fa-chevron-right"></i>
                     </a>
@@ -41,7 +41,8 @@
                 </div>
             </div>
             {% endfor %}
-            
+            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
         </div>
         
         

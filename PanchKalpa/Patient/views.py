@@ -2,26 +2,40 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
-
+from django.utils import timezone
 from Patient.models import PatientProfile, Appointment
 from therapist.models import Therapist, Therapy
 
 # ------------------ Dashboard ------------------
 @login_required
 def dashboard(request):
-    # Get ALL upcoming appointments
+    patient = request.user.patientprofile
+
     upcoming = Appointment.objects.filter(
-        patient=request.user
-    ).order_by("date", "time")
+        patient=patient,
+        date__gte=timezone.now().date()
+    ).order_by("date")
+
+    history = Appointment.objects.filter(
+        patient=patient,
+        date__lt=timezone.now().date()
+    ).order_by("-date")
 
     return render(request, "patient-portal/dashboard.html", {
-        "upcoming": upcoming
+        "upcoming": upcoming,
+        "history": history
     })
-
+        
 
 # ------------------ Appointments ------------------
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Appointment
+from therapist.models import Therapist, Therapy
+
 @login_required
 def appointments(request):
+    patient = request.user.patientprofile   # ✅ ALWAYS get profile first
     therapies = Therapy.objects.all()
     therapists = Therapist.objects.all()
 
@@ -32,7 +46,7 @@ def appointments(request):
         time = request.POST.get("time")
 
         Appointment.objects.create(
-            patient=request.user,
+            patient=patient,              # ✅ FIXED
             therapy_id=therapy_id,
             therapist_id=therapist_id,
             date=date,
@@ -41,13 +55,21 @@ def appointments(request):
 
         return redirect("patient-appointments")
 
-    upcoming = Appointment.objects.filter(patient=request.user).order_by("date")
+    upcoming = Appointment.objects.filter(
+        patient=patient
+    ).order_by("date")
+    
+    history = Appointment.objects.filter(
+        patient=patient
+    ).order_by("-date")
 
     return render(request, "patient-portal/appointments.html", {
         "therapies": therapies,
         "therapists": therapists,
         "upcoming": upcoming,
+        "history": history
     })
+
 
 
 # ------------------ Profile PAGE ------------------
@@ -111,7 +133,7 @@ def progress(request):
 # def dashboard(request):
 #     # Get ALL upcoming appointments
 #     upcoming = Appointment.objects.filter(
-#         patient=request.user
+#         patient=request.user.patientprofile
 #     ).order_by("date", "time")
 
 #     return render(request, "patient-portal/dashboard.html", {
