@@ -1,0 +1,128 @@
+ {% comment %} {% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Therapist Login | Panchkalpa</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/login-page/login.css' %}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="/static/assets/panchkalpa-logo-trans.png" alt="Panchkalpa Logo">
+        </div>
+    </nav>
+
+    <section class="login-container">
+        <div class="login-box">
+
+            <h2 class="title">Panchkalpa</h2>
+            <p class="subtitle">Therapist Access Portal</p>
+
+            <!-- THERAPIST LOGIN FORM -->
+            <form class="form active-form" method="POST" action="{% url 'therapist-login' %}">
+                {% csrf_token %}
+
+                <label>Email Address</label>
+                <input name="email" type="email" placeholder="therapist@email.com" required>
+
+                <label>Password</label>
+                <input name="password" type="password" placeholder="••••••••" required>
+
+                <div class="help-recover">
+                    <span class="for-pass"><a href="#">Forgot Password?</a></span>
+                </div>
+
+                <button  type="submit" class="main-btn">
+                    Login as Therapist</button>
+            </form>
+
+            <!-- SWITCH BACK TO PATIENT -->
+            <div class="alt-login-link">
+                <p>Not a therapist?</p>
+                <a href="{% url 'login' %}" class="alt-login-btn">Login as Patient →</a>
+            </div>
+
+        </div>
+    </section>
+
+</body>
+</html> {% endcomment %}
+
+
+
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Therapist Login | Panchkalpa</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/login-page/login.css' %}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <img src="/static/assets/panchkalpa-logo-trans.png" alt="Panchkalpa Logo">
+        </div>
+    </nav>
+
+    <section class="login-container">
+        <div class="login-box">
+
+            <h2 class="title">Panchkalpa</h2>
+            <p class="subtitle">Therapist Access Portal</p>
+
+            <!-- THERAPIST LOGIN FORM -->
+        <form method="POST" action="{% url 'therapist_login' %}">
+
+                {% csrf_token %}
+
+                {% if error %}
+                    <p style="color:red; text-align:center; margin-bottom:10px;">
+                        {{ error }}
+                    </p>
+                {% endif %}
+
+                <label>Email Address</label>
+                <input name="email" type="email" placeholder="therapist@email.com" required>
+
+                <label>Password</label>
+                <input name="password" type="password" placeholder="••••••••" required>
+
+                <div class="help-recover">
+                    <span class="for-pass"><a href="#">Forgot Password?</a></span>
+                </div>
+
+                <button type="submit" class="main-btn">Login as Therapist</button>
+            </form>
+
+            <!-- SWITCH BACK TO PATIENT -->
+            <div class="alt-login-link">
+                <p>Not a therapist?</p>
+                <a href="{% url 'login' %}" class="alt-login-btn">Login as Patient →</a>
+            </div>
+
+        </div>
+    </section>
+
+</body>
+</html>

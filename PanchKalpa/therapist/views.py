@@ -1,64 +1,81 @@
+# 
+
+
+
+# therapist/views.py
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import check_password
 from .models import Therapist
+
+# ---------------------- LOGIN ----------------------
 
 def therapist_login(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
 
+        # Check therapist exists
         try:
             therapist = Therapist.objects.get(email=email)
         except Therapist.DoesNotExist:
-            return render(request, "accounts/therapist_login.html", {
+            return render(request, "therapist/therapist_login.html", {
                 "error": "Therapist not found"
             })
 
+        # Check password
         if not check_password(password, therapist.password):
-            return render(request, "accounts/therapist_login.html", {
+            return render(request, "therapist/therapist_login.html", {
                 "error": "Incorrect password"
             })
 
+        # SUCCESS: store session
         request.session["therapist_id"] = therapist.id
         return redirect("therapist_dashboard")
 
-    return render(request, "accounts/therapist_login.html")
+    return render(request, "therapist/therapist_login.html")
 
 
+# ---------------------- MIDDLEWARE ----------------------
+
+def therapist_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if "therapist_id" not in request.session:
+            return redirect("therapist_login")
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 
+# ---------------------- DASHBOARD ----------------------
 
+@therapist_required
 def therapist_dashboard(request):
-    therapist_id = request.session.get("therapist_id")
-    if not therapist_id:
-        return redirect("therapist_login")
-
-    therapist = Therapist.objects.get(id=therapist_id)
-
-    return render(request, "therapist-portal/dashboard.html", {
-        "therapist": therapist
-    })
-
-def therapist_teleconsult(request):
-    therapist_id = request.session.get("therapist_id")
-    if not therapist_id:
-        return redirect("therapist_login")
-    therapist = Therapist.objects.get(id=therapist_id)
-    return render(request, "therapist-portal/teleconsult.html", {"therapist": therapist})
+    therapist = Therapist.objects.get(id=request.session["therapist_id"])
+    return render(request, "therapist-portal/dashboard.html", {"therapist": therapist})
 
 
+# ---------------------- OTHER PAGES ----------------------
 
-# Create your views here.
+@therapist_required
 def therapist_patients(request):
     return render(request, "therapist-portal/patients.html")
 
+
+@therapist_required
 def session_entry(request):
     return render(request, "therapist-portal/session.html")
 
+
+@therapist_required
 def therapist_inventory(request):
     return render(request, "therapist-portal/inventory.html")
 
+
+@therapist_required
 def therapist_reports(request):
     return render(request, "therapist-portal/reports.html")
-def therapist_reports(request):
+
+
+@therapist_required
+def therapist_teleconsult(request):
     return render(request, "therapist-portal/teleconsult.html")

@@ -16,18 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from accounts.views import landing_page
+from accounts.views import landing_page, therapist_login
 
 urlpatterns = [
     path('', landing_page, name='landing'),
+    path('', include('progress.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('patient/', include('Patient.urls')),
     path('progress/', include('progress.urls')),
     path("billing/", include("billing.urls", namespace="billing")),
-    # path("patient/billing/", include("billing.urls", namespace="billing")),
-    path("therapist/", include("therapist.urls")),
-
-
+    path("therapist/login/", therapist_login, name="therapist-login"),
+    path('therapist/', include('therapist.urls')),
 
 ]

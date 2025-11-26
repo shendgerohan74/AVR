@@ -155,6 +155,105 @@ h4 {
     padding-bottom: 15px;
 }
 
+.progress-page-subtitle {
+    color: var(--theme-muted);
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.progress-selfcheck-form {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.progress-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--theme-brown);
+    margin-bottom: 8px;
+}
+
+.progress-selfcheck-row important{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.85rem;
+}
+
+.progress-selfcheck-row input[type="number"] {
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 0.9rem;
+}
+
+.progress-submit-btn {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: none;
+    background: var(--theme-brown);
+    color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.progress-submit-btn:hover {
+    background: #5c2a0b;
+}
+
+.progress-divider {
+    border: none;
+    border-top: 1px dashed rgba(0,0,0,0.1);
+    margin: 15px 0;
+}
+
+.progress-therapist-section {
+    margin-top: 5px;
+}
+
+.progress-meta {
+    font-size: 0.8rem;
+    color: var(--theme-muted);
+    margin-bottom: 10px;
+}
+
+.progress-empty-state {
+    font-size: 0.85rem;
+    color: var(--theme-muted);
+    text-align: center;
+    padding: 20px 10px;
+}
+
+.progress-message {
+    margin-top: 6px;
+    font-size: 0.8rem;
+}
+
+.progress-message.success {
+    color: #2E7D32;
+}
+
+.progress-message.error {
+    color: #C62828;
+}
+
+.progress-report-summary {
+    font-size: 0.9rem;
+    color: var(--theme-text-dark);
+    margin-top: 6px;
+}
+
+.progress-stat-value.small-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
 .progress-page-title {
     font-size: 2rem;
 }
