@@ -2,41 +2,18 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import SessionNote, DailyProgress
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 import json
+    
 
-
-@login_required
-def progress_chart_data(request):
-    notes = SessionNote.objects.filter(
-        patient=request.user,
-        recovery_score__isnull=False
-    ).order_by("-created_at")[:6]
-
-    # oldest → newest for smooth chart
-    notes = list(reversed(notes))
-
-    labels = [n.created_at.strftime("%b %d") for n in notes]
-    scores = [n.recovery_score for n in notes]
-
-    return JsonResponse({
-        "labels": labels,
-        "scores": scores
-    })
-
-
-@login_required
-def progress_page(request):
-    return render(request, "progress/progress.html")
-
-
-@csrf_exempt
 @login_required
 def save_daily_log(request):
     if request.method != "POST":
         return JsonResponse({"error": "Invalid method"}, status=400)
 
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+    except:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
 
     DailyProgress.objects.create(
         patient=request.user,
@@ -45,7 +22,7 @@ def save_daily_log(request):
         sleep=data.get("sleep"),
     )
 
-    return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "success"}, status=200)
 
 
 @login_required
@@ -57,7 +34,8 @@ def get_progress(request):
     stress_scores = [log.stress or 0 for log in logs]
     sleep_scores = [log.sleep or 0 for log in logs]
 
-    latest = logs.last()
+    # therapist data must come from SessionNote
+    session = SessionNote.objects.filter(patient=request.user).order_by("-created_at").first()
 
     return JsonResponse({
         "patient_daily": {
@@ -67,13 +45,18 @@ def get_progress(request):
             "sleep": sleep_scores
         },
         "therapist_session": {
-            "date": latest.date.strftime("%d %b %Y") if latest else None,
-            "mobility_score": getattr(latest, "mobility", None),
-            "pain_score": getattr(latest, "therapist_pain", None),
-            "remark": getattr(latest, "remark", None),
+            "date": session.created_at.strftime("%d %b %Y") if session else None,
+            "mobility_score": session.mobility_score if session else None,
+            "pain_score": session.pain_score if session else None,
+            "remark": session.remark if session else None,
         },
         "report": {
-            "last_updated": latest.date.strftime("%d %b %Y") if latest else None,
-            "summary": "Report generated based on recent logs." if latest else None
+            "last_updated": labels[-1] if labels else None,
+            "summary": "Report generated based on recent logs." if labels else None
         }
     })
+
+
+@login_required
+def progress_page(request):
+    return render(request, "patient-portal/progress.html")

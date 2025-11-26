@@ -33,53 +33,53 @@
 
     <!-- Grid -->
     <div class="dashboard-layout-grid">
-<div class="dashboard-content-card dashboard-col-span-4">
-    <div class="dashboard-card-header-title">
-        <i class="far fa-calendar-check" style="color:var(--theme-gold-dark)"></i>
-        Upcoming Appointment
-    </div>
-
-    {% if upcoming %}
-    {% for appt in upcoming %}
-
-    <div class="dashboard-appointment-widget">
-
-        <!-- Therapy & Therapist -->
-        <div class="dashboard-appointment-row">
-            <span class="dashboard-appointment-label">Therapy</span>
-            <span class="dashboard-appointment-value">{{ appt.therapy.name }}</span>
-        </div>
-
-        <div class="dashboard-appointment-row">
-            <span class="dashboard-appointment-label">Therapist</span>
-            <span class="dashboard-appointment-value">{{ appt.therapist.name }}</span>
-        </div>
-
-        <!-- Date & Time Row -->
-        <div class="dashboard-appointment-row" style="align-items: center; margin-top: 12px;">
-
-            <!-- Date -->
-            <div style="text-align:center;">
-                <div style="font-size:1.4rem; font-weight:700; color:var(--theme-brown);">
-                    {{ appt.date|date:"d" }}
-                </div>
-                <div style="font-size:0.75rem; color:var(--theme-muted); text-transform:uppercase;">
-                    {{ appt.date|date:"M" }}
-                </div>
+        <div class="dashboard-content-card dashboard-col-span-4">
+            <div class="dashboard-card-header-title">
+                <i class="far fa-calendar-check" style="color:var(--theme-gold-dark)"></i>
+                Upcoming Appointment
             </div>
 
-            <!-- Time -->
-            <div style="text-align:center;">
-                <div style="font-size:1.4rem; font-weight:700; color:var(--theme-brown);">
-                    {{ appt.time }}
-                </div>
-                <div style="font-size:0.75rem; color:var(--theme-muted); text-transform:uppercase;">
-                    {{ appt.time|slice:"-2:" }}
-                </div>
-            </div>
+            {% if upcoming %}
+            {% for appt in upcoming %}
 
-            <!-- Button -->
-            <button style="
+            <div class="dashboard-appointment-widget">
+
+                <!-- Therapy & Therapist -->
+                <div class="dashboard-appointment-row">
+                    <span class="dashboard-appointment-label">Therapy</span>
+                    <span class="dashboard-appointment-value">{{ appt.therapy.name }}</span>
+                </div>
+
+                <div class="dashboard-appointment-row">
+                    <span class="dashboard-appointment-label">Therapist</span>
+                    <span class="dashboard-appointment-value">{{ appt.therapist.name }}</span>
+                </div>
+
+                <!-- Date & Time Row -->
+                <div class="dashboard-appointment-row" style="align-items: center; margin-top: 12px;">
+
+                    <!-- Date -->
+                    <div style="text-align:center;">
+                        <div style="font-size:1.4rem; font-weight:700; color:var(--theme-brown);">
+                            {{ appt.date|date:"d" }}
+                        </div>
+                        <div style="font-size:0.75rem; color:var(--theme-muted); text-transform:uppercase;">
+                            {{ appt.date|date:"M" }}
+                        </div>
+                    </div>
+
+                    <!-- Time -->
+                    <div style="text-align:center;">
+                        <div style="font-size:1.4rem; font-weight:700; color:var(--theme-brown);">
+                            {{ appt.time }}
+                        </div>
+                        <div style="font-size:0.75rem; color:var(--theme-muted); text-transform:uppercase;">
+                            {{ appt.time|slice:"-2:" }}
+                        </div>
+                    </div>
+
+                    <!-- Button -->
+                    <button style="
                 background:var(--theme-brown);
                 color:white;
                 padding:8px 16px;
@@ -87,18 +87,18 @@
                 border-radius:20px;
                 cursor:pointer;
             ">
-                Details <i class="fas fa-arrow-right"></i>
-            </button>
+                        Details <i class="fas fa-arrow-right"></i>
+                    </button>
 
+                </div>
+
+            </div>
+
+            {% endfor %}
+            {% else %}
+            <p class="no-appt">No upcoming appointments.</p>
+            {% endif %}
         </div>
-
-    </div>
-
-    {% endfor %}
-    {% else %}
-        <p class="no-appt">No upcoming appointments.</p>
-    {% endif %}
-</div>
 
 
 
@@ -164,40 +164,28 @@
 
 <!-- SCRIPT -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
-    fetch("{% url 'progress-chart-data' %}")
-        .then(res => res.json())
-        .then(data => {
-            const ctx = document.getElementById("progressChart");
+        fetch("/api/patient/progress/")
 
-            new Chart(ctx, {
-                type: "line",
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        label: "Recovery Score",
-                        data: data.scores,
-                        borderColor: "#78350f",
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100
-                        }
+            .then(data => {
+                const ctx = document.getElementById("progressChart");
+
+                new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: data.patient_daily.labels,
+                        datasets: [{
+                            label: "Recovery Score",
+                            data: data.patient_daily.pain, // or stress/sleep/recovery
+                            borderWidth: 2
+                        }]
                     }
-                }
+                });
             });
 
-        });
 
-});
+    });
 </script>
 
 
