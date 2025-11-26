@@ -38,7 +38,7 @@
                 Symptom Trend (Self Reported)
             </div>
             <div class="progress-chart-wrapper">
-                <canvas id="symptomChart"></canvas>
+                <canvas id="progressChart"></canvas>
                 <div id="chart-empty-state" class="progress-empty-state" style="display:none;">
                     No self-check entries yet. Submit today’s scores to see your graph.
                 </div>
@@ -171,6 +171,7 @@
             showEmptyStates();
         }
     }
+
 
     function renderSelfTrend(patientDaily) {
         const chartContainer = document.getElementById('symptomChart');
@@ -341,6 +342,40 @@
     function downloadReport() {
         window.location.href = '/api/patient/progress/download/';
     }
+
+    fetch('/get-progress/', {
+    method: 'GET',
+    credentials: 'include'
+})
+.then(res => res.json())
+.then(data => {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.patient_daily.labels,
+            datasets: [
+                {
+                    label: 'Pain',
+                    data: data.patient_daily.pain,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Stress',
+                    data: data.patient_daily.stress,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Sleep',
+                    data: data.patient_daily.sleep,
+                    borderWidth: 2
+                }
+            ]
+        }
+    });
+});
+
 </script>
 
 {% endblock content %}
