@@ -3,7 +3,6 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
 
 from .models import Therapist
 
@@ -43,7 +42,7 @@ def therapist_required(view_func):
 @therapist_required
 def therapist_dashboard(request):
     therapist = Therapist.objects.get(id=request.session["therapist_id"])
-    return render(request, "therapist/dashboard.html", {"therapist": therapist})
+    return render(request, "therapist-portal/dashboard.html", {"therapist": therapist})
 
 
 @therapist_required
