@@ -1,12 +1,39 @@
+# from django.urls import path
+# from .views import login_view, signup_view, logout_view, therapist_signup, therapist_login
+
+# urlpatterns = [
+#     path("login/", login_view, name="login"),
+#     path("signup/", signup_view, name="signup"),
+#     path("logout/", logout_view, name="logout"),
+#     path("therapist-signup/", therapist_signup, name='doc_signup'),
+#     path("therapist/login/", therapist_login, name="therapist-login"),
+    
+
+# ]
+# from django.urls import path
+# from .views import login_view, signup_view, logout_view, therapist_signup
+
+# urlpatterns = [
+#     path("login/", login_view, name="login"),
+#     path("signup/", signup_view, name="signup"),
+#     path("logout/", logout_view, name="logout"),
+
+#     # Therapist Signup Not Allowed
+#     path("therapist-signup/", therapist_signup, name="therapist-signup"),
+# ]
+
+
 from django.urls import path
-from .views import login_view, signup_view, logout_view, therapist_signup, therapist_login
+from .views import login_view, signup_view, logout_view, therapist_signup, landing_page
 
 urlpatterns = [
+    path("", landing_page, name="landing"),  # THIS NOW WORKS
+
     path("login/", login_view, name="login"),
     path("signup/", signup_view, name="signup"),
     path("logout/", logout_view, name="logout"),
-    path("therapist-signup/", therapist_signup, name='doc_signup'),
-    path("therapist/login/", therapist_login, name="therapist-login"),
-    
 
+    # Therapist Signup Not Allowed
+    path("therapist-signup/", therapist_signup, name="therapist-signup"),
+    
 ]

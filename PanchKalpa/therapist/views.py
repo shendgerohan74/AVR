@@ -1,42 +1,40 @@
-
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import check_password
 from .models import Therapist
 
-# ---------------------- LOGIN ----------------------
+# ---------------------- THERAPIST LOGIN ----------------------
 
 def therapist_login(request):
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
 
-        # Check therapist exists
+        # Check if therapist exists
         try:
             therapist = Therapist.objects.get(email=email)
         except Therapist.DoesNotExist:
             return render(request, "therapist/therapist_login.html", {
-                "error": "Therapist not found"
+                "error": "Email not found"
             })
 
         # Check password
-        if not check_password(password, therapist.password):
-            return render(request, "therapist/therapist_login.html", {
-                "error": "Incorrect password"
-            })
+        if check_password(password, therapist.password):
+            request.session["therapist_id"] = therapist.id
+            return redirect("therapist-dashboard")   # ✔ Correct name
 
-        # SUCCESS: store session
-        request.session["therapist_id"] = therapist.id
-        return redirect("therapist_dashboard")
+        return render(request, "therapist/therapist_login.html", {
+            "error": "Wrong password"
+        })
 
     return render(request, "therapist/therapist_login.html")
 
 
-# ---------------------- MIDDLEWARE ----------------------
+# ---------------------- MIDDLEWARE PROTECTOR ----------------------
 
 def therapist_required(view_func):
     def wrapper(request, *args, **kwargs):
         if "therapist_id" not in request.session:
-            return redirect("therapist_login")
+            return redirect("therapist-login")    # ✔ Correct name
         return view_func(request, *args, **kwargs)
     return wrapper
 
