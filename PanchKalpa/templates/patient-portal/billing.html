@@ -14,77 +14,83 @@
 
 {% block content %}
 <!-- Pending Bills -->
-<div class="billing-content-card">
-    <div class="billing-card-header">
-        <i class="fas fa-file-invoice-dollar"></i> Pending Bills
-    </div>
+ <div class="billing-main-container">
 
-    {% for bill in pending %}
-<div class="billing-pending-item">
-    <div class="billing-info-group">
-        <h4>Invoice #{{ bill.id }}</h4>
-        <p>{{ bill.description }}</p>
-    </div>
-
-    <div class="billing-amount-box">
-        <span class="billing-price">₹{{ bill.amount }}</span>
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        <a href="javascript:void(0)" onclick="payNow('{{ bill.id }}')" class="billing-pay-btn">
-            Pay Now <i class="fas fa-chevron-right"></i>
-        </a>
-
-    </div>
-</div>
-{% endfor %}
-
-</div>
-
-
-<!-- Payment History -->
-<div class="billing-content-card">
-    <div class="billing-card-header">
-        <i class="fas fa-history"></i> Payment History
-    </div>
-
-    <table class="billing-table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Invoice ID</th>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% if history %}
-                {% for bill in history %}
-                <tr>
-                    <td>{{ bill.created_at|date:"d M Y" }}</td>
-                    <td>#{{ bill.id }}</td>
-                    <td>{{ bill.description }}</td>
-                    <td>₹{{ bill.amount }}</td>
-                    <td>
-                        {% if bill.status == "paid" %}
+     <div class="billing-page-header">
+         <h1 class="billing-page-title">Billing & Payments</h1>
+        </div>
+        <div class="billing-content-card">
+            <div class="billing-card-header">
+                <i class="fas fa-file-invoice-dollar"></i> Pending Bills
+            </div>
+            
+            {% for bill in pending %}
+            <div class="billing-pending-item">
+                <div class="billing-info-group">
+                    <h4>Invoice #{{ bill.id }}</h4>
+                    <p>{{ bill.description }}</p>
+                </div>
+                
+                <div class="billing-amount-box">
+                    <span class="billing-price">₹{{ bill.amount }}</span>
+                    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                    <a href="javascript:void(0)" onclick="payNow('{{ bill.id }}')" class="billing-pay-btn">
+                        Pay Now <i class="fas fa-chevron-right"></i>
+                    </a>
+                    
+                </div>
+            </div>
+            {% endfor %}
+            
+        </div>
+        
+        
+        <!-- Payment History -->
+        <div class="billing-content-card">
+            <div class="billing-card-header">
+                <i class="fas fa-history"></i> Payment History
+            </div>
+            
+            <table class="billing-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Invoice ID</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    {% if history %}
+                    {% for bill in history %}
+                    <tr>
+                        <td>{{ bill.created_at|date:"d M Y" }}</td>
+                        <td>#{{ bill.id }}</td>
+                        <td>{{ bill.description }}</td>
+                        <td>₹{{ bill.amount }}</td>
+                        <td>
+                            {% if bill.status == "paid" %}
                             <a href="{% url 'billing:download-invoice' bill.id %}" class="billing-pay-btn">
                                 Download <i class="fa fa-download"></i>
                             </a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="5" class="billing-empty-state">No payment history</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
-</div>
-
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="billing-empty-state">No payment history</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        
 <script>
 function payNow(invoiceId) {
     fetch(`/billing/order/${invoiceId}/`)
