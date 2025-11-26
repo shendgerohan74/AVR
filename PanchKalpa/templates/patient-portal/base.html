@@ -99,14 +99,21 @@
 
         </div>
     </nav>
-
-    {% block content %}{% endblock content %}
+    {% if messages %}
     <script>
-        document.querySelector(".mobile-menu-toggle")?.addEventListener("click", () => {
-            const panel = document.querySelector(".mobile-menu-panel");
-            panel.style.display = panel.style.display === "flex" ? "none" : "flex";
-        });
+        {% for message in messages %}
+        alert("{{ message|escapejs }}");
+        {% endfor %}
     </script>
+    {% endif %}
+
+{% block content %}{% endblock content %}
+<script>
+    document.querySelector(".mobile-menu-toggle")?.addEventListener("click", () => {
+        const panel = document.querySelector(".mobile-menu-panel");
+        panel.style.display = panel.style.display === "flex" ? "none" : "flex";
+    });
+</script>
 
 </body>
 
