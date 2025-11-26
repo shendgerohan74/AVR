@@ -1,226 +1,150 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Teleconsult | Panchkalpa</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Therapist Teleconsult | Panchkalpa</title>
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+body { margin:0; font-family:'Lato',sans-serif; background:#fff7e5; }
 
-    <style>
-        /* THEME VARIABLES */
-        :root {
-            --theme-gold: #FFD700;
-            --theme-gold-dark: #C8A300;
-            --theme-cream: #FFF8E6;
-            --theme-brown: #78350f;
-            --theme-bg-light: #fff7e5;
-            --theme-text-dark: #2A241F;
-            --theme-muted: #6b5f5a;
-            --theme-white: #ffffff;
-            --theme-shadow: 0 4px 15px rgba(120,53,15,0.08);
-            --theme-radius: 12px;
-            --theme-nav-height: 80px;
-        }
+/* Video Box */
+#remoteVideo {
+    width: 100%; height: 60vh; background: #000;
+    border-radius: 12px; margin-bottom:10px; position:relative;
+}
+#callStatus {
+    color:#fff; font-size:22px; position:absolute;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+}
+.video-controls {
+    display:flex; gap:15px; justify-content:center;
+}
+.video-btn {
+    background:#78350f; border:none; color:#fff; padding:12px;
+    width:55px; border-radius:50px; font-size:18px; cursor:pointer;
+}
+.video-btn:hover { background:#5b280b; }
+.join-btn { background:#1ea83c !important; width:auto; padding:12px 24px; }
 
-        body {
-            margin: 0;
-            background: var(--theme-bg-light);
-            font-family: 'Lato', sans-serif;
-            padding-top: var(--theme-nav-height);
-        }
+/* CHAT UI */
+.chat-box {
+    background:white; border-radius:12px; padding:18px;
+    height:250px; overflow-y:auto; box-shadow:0 0 10px rgba(0,0,0,0.08);
+}
+.msg-sent {
+    background:#d5e8ff; padding:10px 14px; border-radius:12px;
+    margin:6px 0; text-align:right;
+}
+.msg-received {
+    background:#fbe2c1; padding:10px 14px; border-radius:12px;
+    margin:6px 0; text-align:left;
+}
+.msg-time { font-size:0.7rem; opacity:.6; display:block; margin-top:4px; }
 
-        h1, h2 {
-            font-family: 'Playfair Display', serif;
-            color: var(--theme-brown);
-        }
-
-        /* NAVBAR */
-        .dashboard-navbar-container {
-            position: fixed; top: 0; left: 0; width: 100%;
-            height: var(--theme-nav-height);
-            background: var(--theme-brown);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 30px; z-index: 10;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-
-        .dashboard-nav-links-group {
-            display: flex; gap: 20px; flex: 1; justify-content: center;
-        }
-
-        .dashboard-nav-item-button {
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.85);
-            display: flex;
-            align-items: center; gap: 8px;
-            text-decoration: none;
-        }
-        .dashboard-nav-item-button.active {
-            background: var(--theme-gold);
-            color: var(--theme-brown);
-            font-weight: 700;
-        }
-
-        /* PAGE LAYOUT */
-        .dashboard-main-container {
-            padding: 40px;
-            max-width: 1400px;
-            margin: auto;
-        }
-
-        .dashboard-layout-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 25px;
-        }
-        .col-span-8 { grid-column: span 8; }
-        .col-span-4 { grid-column: span 4; }
-
-        /* CARDS */
-        .dashboard-content-card {
-            background: var(--theme-white);
-            padding: 25px;
-            border-radius: var(--theme-radius);
-            box-shadow: var(--theme-shadow);
-            border: 1px solid rgba(255,215,0,0.15);
-        }
-
-        .dashboard-table { width: 100%; border-collapse: collapse; }
-        .dashboard-table th, .dashboard-table td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .btn-primary {
-            background: var(--theme-brown);
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-    </style>
+.chat-input-area {
+    display:flex; margin-top:8px; gap:8px;
+}
+.chat-input { flex:1; padding:10px; border-radius:8px; border:1px solid #ccc; }
+.send-btn {
+    background:#78350f; border:none; color:white; border-radius:8px;
+    padding:10px 18px; cursor:pointer;
+}
+</style>
 </head>
 
 <body>
+<h2 style="text-align:center; color:#78350f; margin:15px 0; font-family:'Playfair Display'">
+    Teleconsultation - {{ therapist.name }}
+</h2>
 
-    <!-- NAVBAR -->
-   <nav class="dashboard-navbar-container">
-    <div class="dashboard-logo-wrapper">
-        <img src="/static/assets/panchkalpa-logo-trans.png" alt="Panchkalpa" height="80">
-    </div>
+<!-- ⬇️ VIDEO -->
+<div id="remoteVideo">
+    <div id="callStatus">Waiting for patient to join...</div>
+</div>
 
-    <div class="dashboard-nav-links-group">
+<div class="video-controls">
+    <button class="video-btn" onclick="toggleMic()"><i class="fas fa-microphone"></i></button>
+    <button class="video-btn" onclick="toggleVideo()"><i class="fas fa-video"></i></button>
+    <button class="video-btn join-btn" onclick="startJitsiCall()">Join Call</button>
+</div>
 
-        <a href="{% url 'therapist_dashboard' %}" 
-           class="dashboard-nav-item-button {% if request.path == '/therapist/dashboard/' %}active{% endif %}">
-            <i class="fa-brands fa-dashcube"></i> Dashboard
-        </a>
+<br>
 
-        <a href="{% url 'therapist_patients' %}" 
-           class="dashboard-nav-item-button {% if request.path == '/therapist/patients/' %}active{% endif %}">
-            <i class="fa-solid fa-users"></i> Patients
-        </a>
+<!-- ⬇️ CHAT -->
+<div class="chat-box" id="chatContainer"></div>
 
-        <a href="{% url 'session_entry' %}" 
-           class="dashboard-nav-item-button {% if request.path == '/therapist/session-entry/' %}active{% endif %}">
-            <i class="fa-solid fa-file-medical"></i> Session Entry
-        </a>
+<div class="chat-input-area">
+    <input type="text" id="msgInput" class="chat-input" placeholder="Type a message…" onkeypress="handleEnter(event)">
+    <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+</div>
 
-        <a href="{% url 'therapist_teleconsult' %}" 
-           class="dashboard-nav-item-button {% if request.path == '/therapist/teleconsult/' %}active{% endif %}">
-            <i class="fa-solid fa-video"></i> Teleconsult
-        </a>
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+let api = null;
+let muted = false;
+let videoOff = false;
 
-        <a href="{% url 'therapist_inventory' %}" 
-           class="dashboard-nav-item-button {% if request.path == '/therapist/inventory/' %}active{% endif %}">
-            <i class="fa-solid fa-flask"></i> Inventory
-        </a>
+const CSRF = "{{ csrf_token }}";
+const THERAPIST_ID = "{{ therapist.id }}";
 
-        <a href="{% url 'therapist_reports' %}" 
-           class="dashboard-nav-item-button {% if request.path == '/therapist/reports/' %}active{% endif %}">
-            <i class="fa-solid fa-chart-pie"></i> Reports
-        </a>
+// ⭐ Patient username via ?user=
+const patientUsername = new URLSearchParams(window.location.search).get("user");
 
-    </div>
+// ⭐ Jitsi Video Join
+function startJitsiCall() {
+    if (!patientUsername) return alert("⚠ Missing ?user=username in URL!");
+    api = new JitsiMeetExternalAPI("meet.jit.si", {
+        roomName: "PanchkalpaTele_" + patientUsername,
+        parentNode: document.querySelector("#remoteVideo"),
+        width: "100%", height: "100%",
+        userInfo: { displayName: "{{ therapist.name }}" }
+    });
+    api.addEventListener("videoConferenceJoined", () => {
+        document.getElementById("callStatus").style.display = "none";
+    });
+}
 
-    <div class="dashboard-nav-profile-section" style="display:flex;align-items:center;gap:15px;">
-        <div class="dashboard-profile-summary-pill"
-             style="display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.2);
-             padding:6px 15px 6px 6px;border-radius:30px;border:1px solid rgba(255,215,0,0.2);">
-             
-            <div class="dashboard-profile-icon-circle"
-                 style="width:32px;height:32px;background:var(--theme-gold);
-                 color:var(--theme-brown);font-weight:700;border-radius:50%;
-                 display:flex;justify-content:center;align-items:center;">
-                DR
-            </div>
-            <div class="dashboard-profile-name-text" 
-                 style="font-size:0.9rem;color:white;font-weight:600;">
-                {{ therapist.name }}
-            </div>
-        </div>
-    </div>
-</nav>
+function toggleMic() { if(api) api.executeCommand("toggleAudio"); }
+function toggleVideo() { if(api) api.executeCommand("toggleVideo"); }
 
+// ⭐ Send Chat
+function sendMessage() {
+    const msg = document.getElementById("msgInput").value.trim();
+    if (!msg) return;
+    fetch("/chat/send/", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json", "X-CSRFToken":CSRF },
+        body:JSON.stringify({ message:msg, therapist_id:THERAPIST_ID })
+    });
+    document.getElementById("msgInput").value = "";
+}
 
-    <!-- PAGE CONTENT -->
-    <div class="dashboard-main-container">
+// ⭐ Load Chat Every 1 sec
+function loadMessages() {
+    fetch(`/chat/get/${THERAPIST_ID}/`)
+    .then(r => r.json())
+    .then(data => {
+        let box = document.getElementById("chatContainer");
+        box.innerHTML = "";
+        data.forEach(m => {
+            box.innerHTML += `
+                <div class="${m.sender === 'therapist' ? 'msg-sent' : 'msg-received'}">
+                    ${m.message}
+                    <span class="msg-time">${m.time}</span>
+                </div>`;
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+}
 
-        <h1>Teleconsult Sessions</h1>
-        <p style="color: gray; margin-top: -10px;">Manage and join your online consultations</p>
+setInterval(loadMessages, 1000);
+function handleEnter(e){ if(e.key==="Enter") sendMessage(); }
+</script>
 
-        <div class="dashboard-layout-grid">
-
-            <!-- Ongoing / Upcoming Teleconsults -->
-            <div class="dashboard-content-card col-span-8">
-                <h2><i class="fas fa-video" style="color: var(--theme-gold-dark)"></i> Today's Teleconsults</h2>
-
-                <table class="dashboard-table">
-                    <thead>
-                        <tr><th>Patient</th><th>Time</th><th>Category</th><th>Action</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Rohan Patel</strong></td>
-                            <td>10:30 AM</td>
-                            <td>Follow-up</td>
-                            <td><button class="btn-primary">Join Call</button></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Pooja Singh</strong></td>
-                            <td>12:45 PM</td>
-                            <td>Consultation</td>
-                            <td><button class="btn-primary">Join Call</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Patient Side Information -->
-            <div class="dashboard-content-card col-span-4">
-                <h2><i class="fas fa-user-circle" style="color: var(--theme-gold-dark)"></i> Selected Patient</h2>
-
-                <p style="color:gray;">No patient selected.</p>
-
-                <!-- Later, this auto-fills when you click a row -->
-                <div id="patient-info" style="display:none;">
-                    <h3 id="p-name"></h3>
-                    <p><strong>Age:</strong> <span id="p-age"></span></p>
-                    <p><strong>Contact:</strong> <span id="p-contact"></span></p>
-                    <p><strong>Last Visit:</strong> <span id="p-last"></span></p>
-                </div>
-            </div>
-
-        </div>
-    </div>
 </body>
 </html>

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'therapist',
     'progress',
     'billing',
+    'chat',
 
 ]
 

@@ -1,271 +1,133 @@
 {% extends "patient-portal/base.html" %}
-
 {% load static %}
-{% block teleconsult %}active{% endblock teleconsult %}
 
+{% block teleconsult %}active{% endblock teleconsult %}
 {% block title %}Video Consultation{% endblock title %}
 
 {% block style %}
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static "css/patient-portal/teleconsult.css" %}">
-{% endblock style %}    
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/patient-portal/teleconsult.css' %}">
+{% endblock style %}
 
 {% block content %}
 
-    <!-- MAIN CONTAINER -->
-    <div class="video-main-container">
-        
-        <!-- LEFT: VIDEO STREAM -->
-        <div class="video-stream-section">
-            
-            <!-- Remote Video (Doctor) -->
-            <div class="video-remote-feed" id="remoteVideo">
-                <div class="video-status-text" id="callStatus">Waiting for Dr. Ananya Vaidya to join...</div>
-                <!-- Mock Doctor Image (Hidden initially) -->
-                <img src="https://img.freepik.com/free-photo/woman-doctor-wearing-lab-coat-with-stethoscope-isolated_1303-29791.jpg" 
-                     id="doctorFeed" style="display:none;" alt="Doctor Feed">
-            </div>
+<script>
+    const CSRF = "{{ csrf_token }}";
+    const THERAPIST_ID = "{{ therapist.id }}";   // Only once
+</script>
 
-            <!-- Local Video (Patient PIP) -->
-            <div class="video-local-pip">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" id="localVideoPlaceholder" alt="Me">
-                <video id="localVideo" autoplay muted playsinline></video>
-            </div>
+<div class="video-main-container">
 
-            <!-- Controls -->
-            <div class="video-controls-bar">
-                <button class="video-control-btn" id="btnMute" onclick="toggleMute()"><i class="fas fa-microphone"></i></button>
-                <button class="video-control-btn" id="btnCam" onclick="toggleVideo()"><i class="fas fa-video"></i></button>
-                
-                <!-- Start/End Toggle -->
-                <button class="video-control-btn btn-start-call" id="btnCallAction" onclick="toggleCall()">
-                    Start Call
-                </button>
-            </div>
+    <!-- VIDEO AREA -->
+    <div class="video-stream-section">
+        <div class="video-remote-feed" id="remoteVideo">
+            <div class="video-status-text" id="callStatus">Waiting for doctor to join…</div>
         </div>
 
-        <!-- RIGHT: SIDEBAR (Chat) -->
-        <div class="video-sidebar">
-            
-            <!-- Patient Info Header -->
-            <div class="sidebar-info-header">
-                <div class="patient-info-title">Dr. Ananya Vaidya</div>
-                <div class="patient-info-sub">Ayurvedic Physician • 15 mins remaining</div>
-            </div>
-
-            <!-- Chat Messages -->
-            <div class="sidebar-chat-area" id="chatContainer">
-                <div class="chat-msg msg-received">
-                    Namaste Aniket! I will be joining the call in a moment.
-                    <span class="msg-time">10:00 AM</span>
-                </div>
-                <div class="chat-msg msg-received">
-                    Please keep your latest reports ready.
-                    <span class="msg-time">10:01 AM</span>
-                </div>
-            </div>
-
-            <!-- Input Area -->
-            <div class="sidebar-input-area">
-                <button class="chat-action-btn" title="Upload Report" onclick="document.getElementById('fileInput').click()">
-                    <i class="fas fa-paperclip"></i>
-                </button>
-                <input type="file" id="fileInput" style="display:none;" onchange="handleFileUpload(this)">
-                
-                <input type="text" class="chat-input-field" id="msgInput" placeholder="Type a message..." onkeypress="handleEnter(event)">
-                
-                <button class="chat-action-btn" onclick="sendMessage()">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-
-            <!-- Download Prescription -->
-            <div class="sidebar-download-section">
-                <button class="btn-download-presc" onclick="downloadPrescription()">
-                    <i class="fas fa-file-prescription"></i> Download Prescription
-                </button>
-            </div>
-
+        <div class="video-controls-bar">
+            <button class="video-control-btn" id="btnMute" onclick="toggleMute()"><i class="fas fa-microphone"></i></button>
+            <button class="video-control-btn" id="btnCam" onclick="toggleVideo()"><i class="fas fa-video"></i></button>
+            <button class="video-control-btn btn-start-call" onclick="startJitsiCall()">Join Live Consultation</button>
         </div>
     </div>
 
-    <!-- SCRIPTS -->
-    <script>
-        let localStream = null;
-        let isCallActive = false;
+    <!-- CHAT SIDE -->
+    <div class="video-sidebar">
+        <div class="sidebar-info-header">
+            <div class="patient-info-title">{{ therapist.name }}</div>
+            <div class="patient-info-sub">{{ therapist.specialization }} • 15 mins</div>
+        </div>
 
-        // 1. CALL LOGIC (Start/End)
-        async function toggleCall() {
-            const btn = document.getElementById('btnCallAction');
-            const doctorFeed = document.getElementById('doctorFeed');
-            const statusText = document.getElementById('callStatus');
-            const localVideo = document.getElementById('localVideo');
-            const localPlaceholder = document.getElementById('localVideoPlaceholder');
+        <div id="chatContainer" class="sidebar-chat-area"></div>
 
-            if (!isCallActive) {
-                // --- START CALL ---
-                try {
-                    // Request Camera & Mic
-                    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                    
-                    // Display Local Stream
-                    localVideo.srcObject = localStream;
-                    localVideo.style.display = 'block';
-                    localPlaceholder.style.display = 'none';
+        <div class="sidebar-input-area">
+            <button class="chat-action-btn" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-paperclip"></i>
+            </button>
 
-                    // UI Updates
-                    btn.innerHTML = '<i class="fas fa-phone-slash"></i>';
-                    btn.classList.remove('btn-start-call');
-                    btn.classList.add('btn-end-call', 'video-control-btn');
-                    btn.style.width = '50px';
-                    btn.style.padding = '0';
+            <input type="file" id="fileInput" style="display:none;">
+            <input type="text" id="msgInput" class="chat-input-field" placeholder="Type a message…" onkeypress="handleEnter(event)">
+            <button class="chat-action-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
 
-                    statusText.style.display = 'none';
-                    doctorFeed.style.display = 'block'; // Simulate Doctor joining
-                    
-                    isCallActive = true;
-                    addSystemMessage("You started the camera.");
+        <div class="sidebar-download-section">
+            <button class="btn-download-presc"><i class="fas fa-file-prescription"></i> Download Prescription</button>
+        </div>
+    </div>
 
-                } catch (err) {
-                    console.error("Error accessing media devices.", err);
-                    alert("Could not access camera/microphone. Please allow permissions.");
-                }
+</div>
 
-            } else {
-                // --- END CALL ---
-                if(confirm("End the consultation?")) {
-                    // Stop Tracks
-                    if (localStream) {
-                        localStream.getTracks().forEach(track => track.stop());
-                        localStream = null;
-                    }
+<!-- Jitsi API -->
+<script src="https://meet.jit.si/external_api.js"></script>
 
-                    // UI Reset
-                    localVideo.style.display = 'none';
-                    localPlaceholder.style.display = 'block';
-                    
-                    btn.innerHTML = 'Start Call';
-                    btn.classList.remove('btn-end-call', 'video-control-btn');
-                    btn.classList.add('video-control-btn', 'btn-start-call');
-                    btn.style.width = 'auto';
-                    btn.style.padding = '0 25px';
+<script>
+let api = null;
+let muted = false;
+let videoOff = false;
 
-                    statusText.style.display = 'block';
-                    statusText.textContent = "Call Ended";
-                    doctorFeed.style.display = 'none';
-                    
-                    // Reset Control Buttons Visuals
-                    resetControls();
+function startJitsiCall() {
+    const options = {
+        roomName: "PanchkalpaTele_" + "{{ request.user.username }}",
+        parentNode: document.querySelector("#remoteVideo"),
+        width: "100%",
+        height: "100%",
+        userInfo: { displayName: "{{ request.user.first_name }}" }
+    };
 
-                    isCallActive = false;
-                    addSystemMessage("Call ended.");
-                }
-            }
-        }
+    api = new JitsiMeetExternalAPI("meet.jit.si", options);
 
-        // 2. MEDIA CONTROLS
-        function toggleMute() {
-            if (!localStream) return;
-            const audioTrack = localStream.getAudioTracks()[0];
-            const btn = document.getElementById('btnMute');
-            const icon = btn.querySelector('i');
+    api.addEventListener("videoConferenceJoined", () => {
+        document.getElementById("callStatus").style.display = "none";
+    });
+}
 
-            if (audioTrack.enabled) {
-                audioTrack.enabled = false; // Mute
-                icon.classList.replace('fa-microphone', 'fa-microphone-slash');
-                btn.style.background = '#d32f2f';
-            } else {
-                audioTrack.enabled = true; // Unmute
-                icon.classList.replace('fa-microphone-slash', 'fa-microphone');
-                btn.style.background = 'rgba(255,255,255,0.2)';
-            }
-        }
+function toggleMute() {
+    if (!api) return;
+    muted = !muted;
+    api.executeCommand("toggleAudio");
+    document.getElementById("btnMute").style.background = muted ? "#d32f2f" : "rgba(255,255,255,0.2)";
+}
 
-        function toggleVideo() {
-            if (!localStream) return;
-            const videoTrack = localStream.getVideoTracks()[0];
-            const btn = document.getElementById('btnCam');
-            const icon = btn.querySelector('i');
+function toggleVideo() {
+    if (!api) return;
+    videoOff = !videoOff;
+    api.executeCommand("toggleVideo");
+    document.getElementById("btnCam").style.background = videoOff ? "#d32f2f" : "rgba(255,255,255,0.2)";
+}
 
-            if (videoTrack.enabled) {
-                videoTrack.enabled = false; // Turn Cam Off
-                icon.classList.replace('fa-video', 'fa-video-slash');
-                btn.style.background = '#d32f2f';
-            } else {
-                videoTrack.enabled = true; // Turn Cam On
-                icon.classList.replace('fa-video-slash', 'fa-video');
-                btn.style.background = 'rgba(255,255,255,0.2)';
-            }
-        }
+function sendMessage() {
+    const msg = document.getElementById("msgInput").value.trim();
+    if (!msg) return;
 
-        function resetControls() {
-            const muteBtn = document.getElementById('btnMute');
-            const vidBtn = document.getElementById('btnCam');
-            
-            muteBtn.style.background = 'rgba(255,255,255,0.2)';
-            muteBtn.querySelector('i').className = 'fas fa-microphone';
-            
-            vidBtn.style.background = 'rgba(255,255,255,0.2)';
-            vidBtn.querySelector('i').className = 'fas fa-video';
-        }
+    fetch("/chat/send/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": CSRF },
+        body: JSON.stringify({ message: msg, therapist_id: THERAPIST_ID })
+    });
 
-        // 3. CHAT LOGIC
-        function sendMessage() {
-            const input = document.getElementById('msgInput');
-            const text = input.value.trim();
-            if (text) {
-                const container = document.getElementById('chatContainer');
-                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                const html = `
-                <div class="chat-msg msg-sent">
-                    ${text}
-                    <span class="msg-time">${time}</span>
-                </div>`;
-                
-                container.innerHTML += html;
-                input.value = '';
-                container.scrollTop = container.scrollHeight; // Scroll to bottom
-            }
-        }
+    document.getElementById("msgInput").value = "";
+}
 
-        function handleEnter(e) {
-            if (e.key === 'Enter') sendMessage();
-        }
+function loadMessages() {
+    fetch(`/chat/get/${THERAPIST_ID}/`)
+        .then(r => r.json())
+        .then(data => {
+            const box = document.getElementById("chatContainer");
+            box.innerHTML = "";
+            data.forEach(m => {
+                box.innerHTML += `
+                    <div class="chat-msg ${m.sender === 'patient' ? 'msg-sent' : 'msg-received'}">
+                        ${m.message}
+                        <span class="msg-time">${m.time}</span>
+                    </div>`;
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+}
 
-        function addSystemMessage(text) {
-            const container = document.getElementById('chatContainer');
-            const html = `<div style="text-align:center; font-size:0.75rem; color:#999; margin:10px 0;">${text}</div>`;
-            container.innerHTML += html;
-            container.scrollTop = container.scrollHeight;
-        }
-
-        // 4. UPLOAD LOGIC
-        function handleFileUpload(input) {
-            if (input.files && input.files[0]) {
-                const fileName = input.files[0].name;
-                const container = document.getElementById('chatContainer');
-                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                const html = `
-                <div class="chat-msg msg-sent">
-                    <i class="fas fa-file-pdf"></i> Sent file: <strong>${fileName}</strong>
-                    <span class="msg-time">${time}</span>
-                </div>`;
-                
-                container.innerHTML += html;
-                container.scrollTop = container.scrollHeight;
-                alert(`"${fileName}" uploaded successfully to doctor.`);
-            }
-        }
-
-        function downloadPrescription() {
-            alert("Downloading Prescription PDF...");
-            // window.open('/api/download-prescription/123');
-        }
-    </script>
+setInterval(loadMessages, 1000);
+function handleEnter(e) { if (e.key === "Enter") sendMessage(); }
+</script>
 
 {% endblock content %}

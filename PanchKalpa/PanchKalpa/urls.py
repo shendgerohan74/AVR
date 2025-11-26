@@ -47,6 +47,7 @@ urlpatterns = [
 
     # Therapist App
     path('therapist/', include('therapist.urls')),
+    path('chat/', include('chat.urls')),
 
     # Patient App
     path('patient/', include('Patient.urls')),
