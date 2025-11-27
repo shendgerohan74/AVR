@@ -37,10 +37,8 @@
             </div>
 
             <!-- LOGIN FORM -->
-           <form method="POST" action="{% url 'login' %}">
-    {% csrf_token %}
-
-
+            <form id="loginForm" class="form" method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
 
                 <label>Email Address</label>
                 <input name="email" id="login_email" type="email" placeholder="your@email.com" required>
@@ -144,7 +142,18 @@
 
 
     <script>
-        // Switch Tabs// Switch Tabs
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("loginForm").classList.add("active-form")
+        })
+
+        document.getElementById("loginForm")
+        const loginTab = document.getElementById("loginTab");
+        const signupTab = document.getElementById("signupTab");
+        const loginForm = document.getElementById("loginForm");
+        const signupForm = document.getElementById("signupForm");
+
+        // Switch Tabs
         loginTab.onclick = () => {
             loginTab.classList.add("active");
             signupTab.classList.remove("active");
@@ -160,13 +169,6 @@
         };
 
 
-        // Password match check (signup)
-        signupForm.addEventListener("submit", (e) => {
-            if (password1.value !== password2.value) {
-                e.preventDefault();
-                alert("Passwords do not match");
-            }
-        });
 
         // Role toggle
         function toggleRoleFields() {
