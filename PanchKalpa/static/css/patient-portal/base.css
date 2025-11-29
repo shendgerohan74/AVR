@@ -462,3 +462,19 @@ h5 {
     border-radius: 8px;
     cursor: pointer;
 }
+
+.user-msg {
+    background: #DCF8C6;
+    padding: 8px 12px;
+    margin: 6px;
+    border-radius: 12px;
+    align-self: flex-end;
+}
+
+.bot-msg {
+    background: #eee;
+    padding: 8px 12px;
+    margin: 6px;
+    border-radius: 12px;
+    align-self: flex-start;
+}
