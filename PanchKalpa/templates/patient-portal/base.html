@@ -107,13 +107,53 @@
     </script>
     {% endif %}
 
-{% block content %}{% endblock content %}
-<script>
-    document.querySelector(".mobile-menu-toggle")?.addEventListener("click", () => {
-        const panel = document.querySelector(".mobile-menu-panel");
-        panel.style.display = panel.style.display === "flex" ? "none" : "flex";
-    });
-</script>
+
+    <!-- 🔥 CHATBOT FLOATING BUTTON -->
+    <div id="chatbot-button">
+        <img id="chatbot-avatar" src="{% static "assets/AyurMitra-logo.png" %}" alt="Chatbot">
+    </div>
+
+    <!-- 🔥 CHATBOT POPUP WINDOW -->
+    <div id="chatbot-popup">
+        <div class="chatbot-header">
+            <span>Chat Support</span>
+            <button id="chatbot-close">&times;</button>
+        </div>
+
+        <div class="chatbot-body" id="chatbot-body">
+            <div class="bot-msg">Hi! How can I help you?</div>
+        </div>
+
+        <div class="chatbot-input-area">
+            <input type="text" id="chatbot-input" placeholder="Type your message...">
+            <button id="chatbot-send"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+
+    
+    {% block content %}{% endblock content %}
+    <script>
+        document.querySelector(".mobile-menu-toggle")?.addEventListener("click", () => {
+            const panel = document.querySelector(".mobile-menu-panel");
+            panel.style.display = panel.style.display === "flex" ? "none" : "flex";
+        });
+
+
+        const chatButton = document.getElementById("chatbot-button");
+        const chatPopup = document.getElementById("chatbot-popup");
+        const chatClose = document.getElementById("chatbot-close");
+
+        chatButton.onclick = () => {
+            chatPopup.style.display = "flex";
+        };
+
+        chatClose.onclick = () => {
+            chatPopup.style.display = "none";
+        };
+
+
+    </script>
 
 </body>
 
