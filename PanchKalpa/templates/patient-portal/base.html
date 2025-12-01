@@ -117,7 +117,7 @@
     </div>
 
     <!-- 🔥 CHATBOT POPUP WINDOW -->
-    <div id="chatbot-popup">
+    <div id="chatbot-popup">    
         <div class="chatbot-header">
             <span>Chat Support</span>
             <button id="chatbot-close">&times;</button>
@@ -183,6 +183,13 @@
             appendMessage(message, "user");
             chatInput.value = "";
 
+            let sessionId = localStorage.getItem("sessionId");
+if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("sessionId", sessionId);
+}
+
+
             // Show "typing..."
             const typingEl = document.createElement("div");
             typingEl.classList.add("bot-msg");
@@ -192,19 +199,27 @@
 
             // Send to backend (n8n)
             try {
-                const res = await fetch("https://shendgerohan33.app.n8n.cloud/webhook/chat", {
+                const res = await fetch("https://shendgerohan33.app.n8n.cloud/webhook/ai-chatbot", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message })
+                    body: JSON.stringify({ message, sessionId })
                 });
 
-                const data = await res.json();
+                const data = await res.json();  
 
                 // Remove typing
                 typingEl.remove();
 
                 // Show bot reply
-                appendMessage(data.reply, "bot");
+                appendMessage(
+                    typeof data === "string"
+                        ? data
+                        : typeof data.reply === "string"
+                            ? data.reply
+                            : JSON.stringify(data),
+                    "bot"
+                );
+
 
             } catch (error) {
                 typingEl.remove();
@@ -213,13 +228,8 @@
             }
         }
     </script>
-  {% comment %} <script type="module">
-        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
-        createChat({
-            webhookUrl: 'https://shendgerohan33.app.n8n.cloud/webhook/797a3a5d-ff37-4d08-afcf-fc090b142f5f/chat'
-        }); {% endcomment %}
-    </script> 
+    </script>
 
 </body>
 

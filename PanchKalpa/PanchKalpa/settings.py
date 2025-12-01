@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'progress',
     'billing',
     'chat',
+    # 'aiassistant',
     
 
 ]
