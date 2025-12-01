@@ -1,156 +1,280 @@
 {% extends "patient-portal/base.html" %}
 {% load static %}
 
-{% block appointments %}active{% endblock appointments %}
-
-{% block title %}Appointments{% endblock title %}
+{% block appointments %}active{% endblock %}
+{% block title %}Appointments{% endblock %}
 
 {% block style %}
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="{% static 'css/patient-portal/appointments.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{% static 'css/patient-portal/appointments.css' %}">
 
+<style>
+/* ---------------- AI BOXES ------------------- */
+.ai-box {
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-size: 0.95rem;
+}
+
+.ai-center {
+    background: #e9fff0;
+    border-left: 4px solid #2ecc71;
+}
+
+.ai-doctor {
+    background: #eef4ff;
+    border-left: 4px solid #4c8bff;
+}
+
+.ai-title {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.ai-sub {
+    font-size: 0.85rem;
+    color: #444;
+}
+
+/* Address input match with dropdown */
+#ai-city.booking-input-select {
+    height: 45px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 0.95rem;
+    padding-left: 12px;
+}
+
+#ai-city.booking-input-select:focus {
+    border-color: var(--theme-gold-dark);
+    box-shadow: 0 0 0 2px rgba(255,193,7,0.25);
+}
+
+/* Slot selected */
+.booking-time-slot.selected {
+    background: #4c8bff;
+    color: white;
+    border-color: #4c8bff;
+}
+</style>
 {% endblock style %}
 
+
+
 {% block content %}
-      <!-- MAIN CONTENT -->
-    <div class="appointments-main-container">
-        
-        <div class="appointments-page-header">
-            <h1 class="appointments-page-title">Appointments</h1>
-        </div>
 
-        <div class="appointments-grid-layout">
-            
-            <!-- 1. BOOK APPOINTMENT FORM -->
-            <div class="appointments-content-card">
-                <div class="appointments-card-header">
-                    <i class="far fa-calendar-plus" style="color:var(--theme-gold-dark)"></i> Book New Session
-                </div>
+<div class="appointments-main-container">
 
-                <form method="post" action="{% url 'patient-appointments' %}">
-                    {% csrf_token %}
+    <div class="appointments-page-header">
+        <h1 class="appointments-page-title">Appointments</h1>
+    </div>
 
-                    <div class="booking-form-group">
-                        <label class="booking-label">Select Therapy</label>
-                        <select class="booking-input-select" name="therapy" required>
-                            <option value="">-- Choose Therapy --</option>
-                            {% for t in therapies %}
-                            <option value="{{ t.id }}">{{ t.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+    <div class="appointments-grid-layout">
 
-                    <div class="booking-form-group">
-                        <label class="booking-label">Select Therapist</label>
-                        <select class="booking-input-select" name="therapist" required>
-                            <option value="">-- Choose Therapist --</option>
-                            {% for th in therapists %}
-                            <option value="{{ th.id }}">{{ th.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="booking-form-group">
-                        <label class="booking-label">Date</label>
-                        <input type="date" class="booking-input-date" name="date" id="input-date" required onchange="fetchSlots()">
-                    </div>
-
-                    <div class="booking-form-group">
-                        <label class="booking-label">Available Slots</label>
-                        <div class="booking-slots-grid" id="slots-container">
-                            <div style="color:#aaa; font-size:0.9rem;">Select a date first</div>
-                        </div>
-
-                        <input type="hidden" name="time" id="input-time" required>
-                    </div>
-
-                    <button type="submit" class="booking-submit-btn">Confirm Booking</button>
-                </form>
-            </div>
-
-            <!-- 2. UPCOMING -->
-            <div class="appointments-content-card">
-                <div class="appointments-card-header">
-                    <i class="fas fa-hourglass-half" style="color:var(--theme-gold-dark)"></i> Upcoming Sessions
-                </div>
-
-                <div id="upcoming-list">
-                    {% if upcoming %}
-                        {% for appt in upcoming %}
-                        <div class="appointment-list-item">
-                            <div class="appointment-info">
-                                <h4>{{ appt.therapy.name }}</h4>
-                                <div class="appointment-meta">
-                                    <span><i class="far fa-calendar"></i> {{ appt.date }}</span>
-                                    <span><i class="far fa-clock"></i> {{ appt.time }}</span>
-                                </div>
-                                <div style="font-size:0.8rem; color:var(--theme-muted);">{{ appt.therapist.name }}</div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p style="text-align:center; color:#999;">No upcoming appointments.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-        </div>
-
-        <!-- HISTORY (Optional) -->
+        <!-- BOOK SESSION -->
         <div class="appointments-content-card">
             <div class="appointments-card-header">
-                <i class="fas fa-history" style="color:var(--theme-gold-dark)"></i> Past Appointment History
+                <i class="far fa-calendar-plus" style="color:var(--theme-gold-dark)"></i> Book New Session
             </div>
 
-            <div class="history-table-wrapper">
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>Therapy</th>
-                            <th>Date</th>
-                            <th>Therapist</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-list">
-                        <tr><td colspan="4" style="text-align:center; color:#aaa;">No records available</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <form method="post" action="{% url 'patient-appointments' %}">
+                {% csrf_token %}
+
+                <!-- CITY -->
+                <div class="booking-form-group">
+                    <label class="booking-label"><i class="fas fa-location-dot"></i> Address</label>
+                    
+                    <input 
+                        type="text" 
+                        id="ai-city" 
+                        class="booking-input-select"
+                        placeholder="Enter your city..."
+                        onkeyup="findCenterAI()"
+                    >
+                    
+                    <div id="ai-center-result"></div>
+                </div>
+
+                <!-- THERAPY -->
+                <div class="booking-form-group">
+                    <label class="booking-label"><i class="fas fa-spa"></i> Select Therapy</label>
+                    <select class="booking-input-select" name="therapy" required onchange="autoSuggestDoctor()">
+                        <option value="">-- Choose Therapy --</option>
+                        {% for t in therapies %}
+                        <option value="{{ t.id }}">{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- AI DOCTOR BOX -->
+                <div id="ai-doctor-suggest"></div>
+
+                <!-- THERAPIST -->
+                <div class="booking-form-group">
+                    <label class="booking-label"><i class="fas fa-user-md"></i> Select Therapist</label>
+                    <select class="booking-input-select" name="therapist" required>
+                        <option value="">-- Choose Therapist --</option>
+                        {% for th in therapists %}
+                        <option value="{{ th.id }}">{{ th.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- DATE -->
+                <div class="booking-form-group">
+                    <label class="booking-label"><i class="fas fa-calendar"></i> Date</label>
+                    <input type="date" class="booking-input-date" name="date" id="input-date" required onchange="fetchSlots()">
+                </div>
+
+                <!-- SLOTS -->
+                <div class="booking-form-group">
+                    <label class="booking-label"><i class="fas fa-clock"></i> Available Slots</label>
+
+                    <div class="booking-slots-grid" id="slots-container">
+                        <div style="color:#aaa">Select a date first</div>
+                    </div>
+
+                    <input type="hidden" name="time" id="input-time" required>
+                </div>
+
+                <button type="submit" class="booking-submit-btn">
+                    <i class="fas fa-check-circle"></i> Confirm Booking
+                </button>
+            </form>
         </div>
 
+        <!-- UPCOMING -->
+        <div class="appointments-content-card">
+            <div class="appointments-card-header">
+                <i class="fas fa-hourglass-half"></i> Upcoming Sessions
+            </div>
+
+            <div id="upcoming-list">
+                {% if upcoming %}
+                    {% for appt in upcoming %}
+                    <div class="appointment-list-item">
+                        <div class="appointment-info">
+                            <h4>{{ appt.therapy.name }}</h4>
+                            <div class="appointment-meta">
+                                <span><i class="far fa-calendar"></i> {{ appt.date }}</span>
+                                <span><i class="far fa-clock"></i> {{ appt.time }}</span>
+                            </div>
+                            <div style="font-size:0.8rem; color:var(--theme-muted);">
+                                {{ appt.therapist.name }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="text-align:center; color:#999;">No upcoming appointments.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
-    
 
-    <!-- SLOT GENERATOR -->
-    <script>
-        function fetchSlots() {
-            const date = document.getElementById('input-date').value;
-            const container = document.getElementById('slots-container');
+</div>
 
-            if (!date) return;
 
-            container.innerHTML = "";
-            const mockTimes = ["09:00 AM", "10:30 AM", "01:00 PM", "03:30 PM", "05:00 PM"];
+<!-- AI SCRIPT -->
+<script>
 
-            mockTimes.forEach(time => {
-                const div = document.createElement('div');
-                div.className = 'booking-time-slot';
-                div.textContent = time;
+/* STEP A — City → Nearest Center */
+function findCenterAI() {
+    let city = document.getElementById("ai-city").value;
+    if (city.length < 3) return;
 
-                div.onclick = () => {
-                    document.querySelectorAll('.booking-time-slot').forEach(el => el.classList.remove('selected'));
-                    div.classList.add('selected');
-                    document.getElementById('input-time').value = time;
-                };
-
-                container.appendChild(div);
-            });
+    fetch(`/therapist/api/nearest-center/?city=${city}`)
+    .then(res => res.json())
+    .then(d => {
+        if (d.found) {
+            document.getElementById("ai-center-result").innerHTML = `
+                <div class="ai-box ai-center">
+                    <div class="ai-title">🤖 AI Found Nearest Center:</div>
+                    <b>${d.center_name}</b> <br>
+                    <span class="ai-sub">📍 ${d.city}</span>
+                </div>
+            `;
+            window.selectedCenter = d.center_name;
+        } else {
+            document.getElementById("ai-center-result").innerHTML =
+                `<span style="color:red">No center found</span>`;
         }
-    </script>
+    });
+}
+
+/* STEP B — Therapy → Doctor Suggest */
+function autoSuggestDoctor() {
+    let therapyName = document.querySelector("select[name='therapy']").selectedOptions[0]?.innerText;
+    if (!therapyName || !window.selectedCenter) return;
+
+    fetch(`/therapist/api/doctors-by-therapy/?therapy=${therapyName}&center=${window.selectedCenter}`)
+    .then(r => r.json())
+    .then(d => {
+        if (!d.found) {
+            document.getElementById("ai-doctor-suggest").innerHTML = "";
+            return;
+        }
+
+        document.getElementById("ai-doctor-suggest").innerHTML = `
+            <div class="ai-box ai-doctor">
+                <div class="ai-title">🤖 AI Recommended:</div>
+                <b>${d.recommended.name}</b><br>
+                ⭐ ${d.recommended.experience} yrs experience<br>
+                <span class="ai-sub">📅 Available today</span>
+            </div>
+        `;
+
+        let dropdown = document.querySelector("select[name='therapist']");
+        for (let opt of dropdown.options) {
+            if (opt.text === d.recommended.name) {
+                opt.text = `${opt.text} (Recommended ⭐)`;
+                dropdown.value = opt.value;
+            }
+        }
+    });
+}
+
+/* STEP C — Slots System */
+function fetchSlots() {
+    let date = document.getElementById("input-date").value;
+    let therapist = document.querySelector("select[name='therapist']").value;
+    let box = document.getElementById("slots-container");
+
+    if (!date || !therapist) {
+        box.innerHTML = "<div style='color:#888'>Select therapy & doctor first</div>";
+        return;
+    }
+
+    fetch(`/therapist/api/available-slots/?doctor_id=${therapist}&date=${date}`)
+    .then(r => r.json())
+    .then(d => {
+        box.innerHTML = "";
+
+        if (d.total === 0) {
+            box.innerHTML = "<div style='color:red'>No slots available</div>";
+            return;
+        }
+
+        d.free_slots.forEach(s => {
+            let slot = document.createElement("div");
+            slot.className = "booking-time-slot";
+            slot.innerText = `${s.start} - ${s.end}`;
+
+            slot.onclick = () => {
+                document.querySelectorAll(".booking-time-slot")
+                    .forEach(el => el.classList.remove("selected"));
+                slot.classList.add("selected");
+                document.getElementById("input-time").value = slot.innerText;
+            };
+
+            box.appendChild(slot);
+        });
+    });
+}
+
+</script>
 
 {% endblock content %}
