@@ -71,3 +71,25 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"{self.therapist.name} - {self.date} ({self.start_time} to {self.end_time})"
+
+
+
+class SessionNote(models.Model):
+    therapist = models.ForeignKey(
+        Therapist,
+        on_delete=models.CASCADE,
+        related_name="session_notes"
+    )
+    patient_name = models.CharField(max_length=150)
+    therapy_performed = models.CharField(max_length=150)
+    session_notes = models.TextField()
+
+    inventory_used = models.CharField(max_length=150)
+    quantity = models.CharField(max_length=50)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    pdf_file = models.FileField(upload_to="session_pdfs/", null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.patient_name} - {self.created_at.date()}"

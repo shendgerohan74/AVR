@@ -248,3 +248,122 @@ def book_appointment(request):
     )
 
     return JsonResponse({"status": "success", "message": "Appointment booked successfully"})
+
+
+
+
+
+from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from django.conf import settings
+import os
+from datetime import datetime
+
+from .models import Therapist, SessionNote
+
+
+def generate_pdf(template_path, context, output_file):
+    html = render_to_string(template_path, context)
+    with open(output_file, "wb+") as pdf:
+        pisa.CreatePDF(html, dest=pdf)
+
+
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+import io
+from datetime import datetime
+from io import BytesIO
+
+def save_session(request):
+    if request.method == "POST":
+        # Fetch form data
+        patient_name = request.POST.get("patient_name")
+        therapy_name = request.POST.get("therapy_name")
+        notes = request.POST.get("notes")
+        inventory_item = request.POST.get("inventory_item")
+        inventory_qty = request.POST.get("inventory_qty")
+        
+        html = render_to_string("pdf/session_template.html", {
+            "patient_name": patient_name,
+            "therapy_name": therapy_name,
+            "notes": notes,
+            "inventory_item": inventory_item,
+            "inventory_qty": inventory_qty,
+            "generated_on": datetime.now().strftime("%d-%m-%Y %I:%M %p"),
+        })
+
+        # ------------------------------------------------------------------
+        #  CREATE PDF IN MEMORY
+        # ------------------------------------------------------------------
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer, pagesize=A4)
+
+        y = 800
+
+        p.setFont("Helvetica-Bold", 18)
+        p.drawString(180, y, "PanchKalpa - Session Report")
+        y -= 40
+
+        p.setFont("Helvetica", 12)
+        date_str = datetime.now().strftime("%d-%m-%Y %I:%M %p")
+        p.drawString(50, y, f"Generated On: {date_str}")
+        y -= 30
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y, "Patient Name:")
+        p.setFont("Helvetica", 12)
+        p.drawString(160, y, patient_name)
+        y -= 30
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y, "Therapy Performed:")
+        p.setFont("Helvetica", 12)
+        p.drawString(200, y, therapy_name)
+        y -= 30
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y, "Inventory Used:")
+        p.setFont("Helvetica", 12)
+        p.drawString(170, y, f"{inventory_item} ({inventory_qty})")
+        y -= 40
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y, "Session Notes:")
+        y -= 25
+
+        p.setFont("Helvetica", 12)
+
+        for line in notes.split("\n"):
+            p.drawString(60, y, line)
+            y -= 20
+
+        p.showPage()
+        p.save()
+
+        buffer.seek(0)
+
+        # ------------------------------------------------------------------
+        #  Return PDF as response (DOWNLOAD)
+        # ------------------------------------------------------------------
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="session_report.pdf"'
+        return response
+
+    return render(request, "therapist-portal/session.html")
+
+
+def session_success(request):
+    return render(request, "therapist-portal/session_success.html")
+
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def session_history(request):
+    therapist = Therapist.objects.get(email=request.session["email"])
+    sessions = SessionNote.objects.filter(therapist=therapist).order_by("-created_at")
+    return render(request, "therapist-portal/session_history.html", {"sessions": sessions})

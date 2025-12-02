@@ -12,10 +12,12 @@ from .views import (
     get_doctors_by_therapy,
     get_doctors_by_center,
     get_available_slots,
-    book_appointment
+    book_appointment,
+
+    save_session,           
+    session_success,
+    session_history      # ← correct import
 )
-
-
 
 urlpatterns = [
     path("login/", therapist_login, name="therapist-login"),
@@ -32,4 +34,9 @@ urlpatterns = [
     path("api/doctors-by-center/", get_doctors_by_center, name="doctors-by-center"),
     path("api/available-slots/", get_available_slots, name="available-slots"),
     path("api/book-appointment/", book_appointment, name="book-appointment"),
+
+    # Session Note System
+    path("save-session/", save_session, name="save_session"),
+    path("session-success/", session_success, name="session_success"),
+    path("session-history/", session_history, name="session_history"),
 ]

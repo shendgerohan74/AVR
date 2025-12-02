@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            margin: 40px;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #7a4b12;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #7a4b12;
+            font-weight: bold;
+        }
+
+        .header p {
+            margin: 2px;
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 8px;
+            color: #4b3c2a;
+            border-left: 5px solid #7a4b12;
+            padding-left: 8px;
+            font-weight: bold;
+        }
+
+        .info-box {
+            border: 1px solid #ccc;
+            padding: 12px 18px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background: #f9f7f1;
+        }
+
+        .info-row {
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .notes-box {
+            border: 1px solid #aaa;
+            padding: 15px;
+            min-height: 120px;
+            background: #fff;
+            border-radius: 6px;
+            margin-top: 5px;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            border-top: 2px solid #ccc;
+            text-align: center;
+            padding-top: 10px;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .signature {
+            margin-top: 60px;
+            text-align: right;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>PanchKalpa Wellness Center</h1>
+        <p>Therapy Session Report</p>
+        <p><strong>Generated On:</strong> {{ generated_on }}</p>
+    </div>
+
+    <!-- Patient Info -->
+    <h3 class="section-title">Patient Information</h3>
+    <div class="info-box">
+        <div class="info-row"><span class="label">Patient Name:</span> {{ patient_name }}</div>
+    </div>
+
+    <!-- Therapy -->
+    <h3 class="section-title">Therapy Details</h3>
+    <div class="info-box">
+        <div class="info-row"><span class="label">Therapy Performed:</span> {{ therapy_name }}</div>
+        <div class="info-row"><span class="label">Inventory Used:</span> {{ inventory_item }} ({{ inventory_qty }})</div>
+    </div>
+
+    <!-- Notes -->
+    <h3 class="section-title">Session Notes</h3>
+    <div class="notes-box">
+        {{ notes }}
+    </div>
+
+    <!-- Signature -->
+    <div class="signature">
+        ___________________________<br>
+        Therapist Signature
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        PanchKalpa Wellness Center • Ayurvedic Healing & Therapies  
+    </div>
+
+</body>
+</html>
