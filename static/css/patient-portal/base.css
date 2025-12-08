@@ -227,14 +227,14 @@ h5 {
 .notify-header-title {
     font-family: 'Playfair Display', serif;
     font-size: 1rem;
-    color: var(--theme-brown);
+    color: var(--theme-white);
     margin: 0;
 }
 
 .notify-action-link {
     font-size: 0.75rem;
     text-decoration: underline;
-    color: var(--theme-muted);
+    color: var(--notify-red-bg);
     cursor: pointer;
     background: none;
     border: none;
@@ -477,4 +477,40 @@ h5 {
     margin: 6px;
     border-radius: 12px;
     align-self: flex-start;
+}
+
+/* #notifyPopup {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.2s ease;
+}
+
+#notifyPopup.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+} */
+
+/* Notification popup (hidden by default) */
+.notify-popup-window {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    width: 320px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease;
+}
+
+/* When toggled */
+.notify-popup-window.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }

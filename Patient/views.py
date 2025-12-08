@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import json
 from django.utils import timezone
 from Patient.models import PatientProfile, Appointment
 from therapist.models import Therapist, Therapy
-from .services import generate_diet_plan   # we will create this next
+from .services import generate_diet_plan
+from .models import Notification
 
 
 # ------------------ Dashboard ------------------
@@ -315,3 +316,66 @@ def prakriti_result(request):
         "kapha": kapha,
         "dominant": dosha
     })
+    
+
+def get_notifications(request):
+    # FIXED: correct related_name
+    patient = request.user.patientprofile  
+
+    notes = Notification.objects.filter(patient=patient).order_by('-created_at')
+
+    data = [{
+        "id": n.id,
+        "title": n.title,
+        "message": n.message,
+        "is_read": n.is_read,
+        "created_at": n.created_at.strftime("%d %b %Y, %I:%M %p")
+    } for n in notes]
+
+    unread_count = notes.filter(is_read=False).count()
+
+    return JsonResponse({"notifications": data, "unread": unread_count})
+
+
+def mark_all_notifications_read(request):
+    patient = request.user.patientprofile
+    Notification.objects.filter(patient=patient, is_read=False).update(is_read=True)
+    return JsonResponse({"status": "ok"})
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import PatientProfile, Notification, NotificationAPIKey
+
+
+@csrf_exempt
+def external_notification(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    api_key = request.headers.get("X-API-KEY")
+
+    if not api_key or not NotificationAPIKey.objects.filter(key=api_key, is_active=True).exists():
+        return JsonResponse({"error": "Invalid API Key"}, status=401)
+
+    try:
+        payload = json.loads(request.body)
+
+        patient_id = payload.get("patient_id")
+        title = payload.get("title")
+        message = payload.get("message")
+
+        patient = PatientProfile.objects.get(id=patient_id)
+
+        Notification.objects.create(
+            patient=patient,
+            title=title,
+            message=message,
+        )
+
+        return JsonResponse({"status": "success"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+

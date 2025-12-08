@@ -34,3 +34,16 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"{self.patient.user.username} - {self.therapy.name}"
+
+
+class Notification(models.Model):
+    patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, related_name="notifications")
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class NotificationAPIKey(models.Model):
+    name = models.CharField(max_length=100)
+    key = models.CharField(max_length=255, unique=True)
+    is_active = models.BooleanField(default=True)

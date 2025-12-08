@@ -72,3 +72,44 @@ def therapist_reports(request):
 @therapist_required
 def therapist_teleconsult(request):
     return render(request, "therapist-portal/teleconsult.html")
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from therapist.models import Therapist
+from Patient.models import Appointment, PatientProfile
+from Patient.utils import notify_patient
+from django.http import HttpResponseForbidden
+
+
+@login_required
+def therapist_send_notification(request):
+    therapist = Therapist.objects.get(user=request.user)
+
+    # All unique patients assigned to this therapist
+    appointments = Appointment.objects.filter(therapist=therapist)
+    patients = list({a.patient for a in appointments})  # unique + list
+
+    if request.method == "POST":
+        patient_id = request.POST.get("patient")
+        title = request.POST.get("title")
+        message = request.POST.get("message")
+
+        # Prevent sending to unrelated patients (security)
+        try:
+            patient = PatientProfile.objects.get(id=patient_id)
+        except PatientProfile.DoesNotExist:
+            return HttpResponseForbidden("Invalid patient")
+
+        if patient not in patients:
+            return HttpResponseForbidden("You cannot message this patient")
+
+        notify_patient(patient, title, message)
+
+        return redirect("therapist-send-notification")  # reload same page
+
+    return render(
+        request,
+        "therapist/send_notification.html",
+        {"patients": patients}
+    )
