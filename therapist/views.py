@@ -43,8 +43,21 @@ def therapist_required(view_func):
 
 @therapist_required
 def therapist_dashboard(request):
-    therapist = Therapist.objects.get(id=request.session["therapist_id"])
-    return render(request, "therapist-portal/dashboard.html", {"therapist": therapist})
+    user = request.user
+
+    if not hasattr(user, "therapistprofile"):
+        return redirect("not_authorized")  # or your fallback page
+
+    therapist = user.therapistprofile
+
+    appointments = Appointment.objects.filter(
+        therapist=therapist,
+        date__gte=timezone.now().date()
+    ).order_by("date")
+
+    return render(request, "therapist/dashboard.html", {
+        "appointments": appointments
+    })
 
 
 # ---------------------- OTHER PAGES ----------------------

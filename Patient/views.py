@@ -35,25 +35,21 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import Appointment
 from therapist.models import Therapist, Therapy
-
 @login_required
 def appointments(request):
-    patient = request.user.patientprofile   # ✅ ALWAYS get profile first
+    patient = request.user.patientprofile
     therapies = Therapy.objects.all()
-    therapists = Therapist.objects.all()
 
     if request.method == "POST":
         therapy_id = request.POST.get("therapy")
-        therapist_id = request.POST.get("therapist")
-        date = request.POST.get("date")
-        time = request.POST.get("time")
 
+        # Create appointment with only therapy and patient.
         Appointment.objects.create(
-            patient=patient,              # ✅ FIXED
+            patient=patient,
             therapy_id=therapy_id,
-            therapist_id=therapist_id,
-            date=date,
-            time=time
+            therapist=None,   # stays empty
+            date=None,
+            time=None
         )
 
         return redirect("patient-appointments")
@@ -61,14 +57,13 @@ def appointments(request):
     upcoming = Appointment.objects.filter(
         patient=patient
     ).order_by("date")
-    
+
     history = Appointment.objects.filter(
         patient=patient
     ).order_by("-date")
 
     return render(request, "patient-portal/appointments.html", {
         "therapies": therapies,
-        "therapists": therapists,
         "upcoming": upcoming,
         "history": history
     })
