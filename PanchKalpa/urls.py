@@ -35,6 +35,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from accounts.views import landing_page   # ONLY THIS
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -55,5 +56,8 @@ urlpatterns = [
     path("progress/", include("progress.urls")),
     
     # path("ai-assistant/", include("ai-assistant.urls")),
+    path('api/voice/', views.voice_api, name='voice_api'),
+    path('voice-chat/', views.voice_chat_page),
+    path("feedback/", include("feedback.urls")),
 
 ]

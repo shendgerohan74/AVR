@@ -9,17 +9,14 @@
 <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap"
     rel="stylesheet">
-<!-- Icons -->
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <link rel="stylesheet" href="{% static "css/patient-portal/dashboard.css" %}">
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 {% endblock style %}
 
 {% block content %}
-<!-- DASHBOARD CONTENT -->
 <div class="dashboard-main-container">
 
     <!-- Header -->
@@ -27,12 +24,13 @@
         <div>
             <h1 class="dashboard-welcome-title">Welcome, {{ request.user.first_name|default:"User" }} 👋</h1>
             <div class="dashboard-current-date" id="current-date"> {% now "l, d F Y" %} </div>
-
         </div>
     </div>
 
-    <!-- Grid -->
+    <!-- GRID -->
     <div class="dashboard-layout-grid">
+
+        <!-- Upcoming Appointment -->
         <div class="dashboard-content-card dashboard-col-span-4">
             <div class="dashboard-card-header-title">
                 <i class="far fa-calendar-check" style="color:var(--theme-gold-dark)"></i>
@@ -40,83 +38,69 @@
             </div>
 
             {% if upcoming %}
-            {% for appt in upcoming %}
-
-            <div class="dashboard-appointment-widget">
-
-                <!-- Therapy & Therapist -->
-                <div class="dashboard-appointment-row">
-                    <span class="dashboard-appointment-label">Therapy</span>
-                    <span class="dashboard-appointment-value">{{ appt.therapy.name }}</span>
-                </div>
-
-                <div class="dashboard-appointment-row">
-                    <span class="dashboard-appointment-label">Therapist</span>
-                    <span class="dashboard-appointment-value">{{ appt.therapist.name }}</span>
-                </div>
-
-                <!-- Date & Time Row -->
-                <div class="dashboard-appointment-row" style="align-items: center; margin-top: 12px;">
-
-                    <!-- Date -->
-                    <div style="text-align:center;">
-                        <div style="font-size:1.4rem; font-weight:700; color:var(--theme-brown);">
-                            {{ appt.date|date:"d" }}
-                        </div>
-                        <div style="font-size:0.75rem; color:var(--theme-muted); text-transform:uppercase;">
-                            {{ appt.date|date:"M" }}
-                        </div>
+                {% for appt in upcoming %}
+                <div class="dashboard-appointment-widget">
+                    <div class="dashboard-appointment-row">
+                        <span class="dashboard-appointment-label">Therapy</span>
+                        <span class="dashboard-appointment-value">{{ appt.therapy.name }}</span>
                     </div>
 
-                    <!-- Time -->
-                    <div style="text-align:center;">
-                        <div style="font-size:1.4rem; font-weight:700; color:var(--theme-brown);">
-                            {{ appt.time }}
-                        </div>
-                        <div style="font-size:0.75rem; color:var(--theme-muted); text-transform:uppercase;">
-                            {{ appt.time|slice:"-2:" }}
-                        </div>
+                    <div class="dashboard-appointment-row">
+                        <span class="dashboard-appointment-label">Therapist</span>
+                        <span class="dashboard-appointment-value">{{ appt.therapist.name }}</span>
                     </div>
 
-                    <!-- Button -->
-                    <button style="
-                background:var(--theme-brown);
-                color:white;
-                padding:8px 16px;
-                border:none;
-                border-radius:20px;
-                cursor:pointer;
-            ">
-                        Details <i class="fas fa-arrow-right"></i>
-                    </button>
+                    <div class="dashboard-appointment-row" style="align-items: center; margin-top: 12px;">
+                        <div style="text-align:center;">
+                            <div style="font-size:1.4rem; font-weight:700; color:var(--theme-brown);">
+                                {{ appt.date|date:"d" }}
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--theme-muted); text-transform:uppercase;">
+                                {{ appt.date|date:"M" }}
+                            </div>
+                        </div>
+
+                        <div style="text-align:center;">
+                            <div style="font-size:1.4rem; font-weight:700; color:var(--theme-brown);">
+                                {{ appt.time }}
+                            </div>
+                            <div style="font-size:0.75rem; color:var(--theme-muted); text-transform:uppercase;">
+                                {{ appt.time|slice:"-2:" }}
+                            </div>
+                        </div>
+
+                        <button style="
+                            background:var(--theme-brown);
+                            color:white;
+                            padding:8px 16px;
+                            border:none;
+                            border-radius:20px;
+                            cursor:pointer;">
+                            Details <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
 
                 </div>
-
-            </div>
-
-            {% endfor %}
+                {% endfor %}
             {% else %}
-            <p class="no-appt">No upcoming appointments.</p>
+                <p class="no-appt">No upcoming appointments.</p>
             {% endif %}
         </div>
 
+        <!-- Progress Chart -->
+        <div class="dashboard-content-card dashboard-col-span-8">
+            <div class="dashboard-card-header-title">
+                <i class="fas fa-chart-line" style="color:var(--theme-gold-dark)"></i>
+                Recovery Overview
+            </div>
 
-
-        <!-- Progress Chart (Same as Progress Page) -->
-<div class="dashboard-content-card dashboard-col-span-8">
-    <div class="dashboard-card-header-title">
-        <i class="fas fa-chart-line" style="color:var(--theme-gold-dark)"></i>
-        Recovery Overview
-    </div>
-
-    <div class="dashboard-chart-wrapper">
-        <canvas id="progressChart"></canvas>
-        <div id="chart-empty-state" class="progress-empty-state" style="display:none;">
-            No self-check entries yet.
+            <div class="dashboard-chart-wrapper">
+                <canvas id="progressChart"></canvas>
+                <div id="chart-empty-state" class="progress-empty-state" style="display:none;">
+                    No self-check entries yet.
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-
 
         <!-- Quick Actions -->
         <div class="dashboard-content-card dashboard-col-span-6">
@@ -124,23 +108,40 @@
                 <i class="fas fa-bolt" style="color:var(--theme-gold-dark)"></i>
                 Quick Actions
             </div>
+
             <div class="dashboard-action-grid">
+
                 <a href="{% url 'patient-appointments' %}" class="dashboard-action-button">
                     <i class="far fa-calendar-plus"></i>
                     <span>Book Appointment</span>
                 </a>
+
                 <a href="{% url 'patient-progress' %}" class="dashboard-action-button">
                     <i class="fas fa-tasks"></i>
                     <span>View Progress</span>
                 </a>
+
                 <a href="{% url 'billing:billing-home' %}" class="dashboard-action-button">
                     <i class="fas fa-file-invoice-dollar"></i>
                     <span>Pay Bills</span>
                 </a>
+
                 <a href="{% url 'patient-teleconsult' %}" class="dashboard-action-button">
                     <i class="fas fa-video"></i>
                     <span>Online Consultation</span>
                 </a>
+
+                <a href="/voice-chat/" class="dashboard-action-button">
+                    <i class="fas fa-microphone"></i>
+                    <span>Voice Chat</span>
+                </a>
+
+                <!-- ⭐ NEW FEEDBACK BUTTON (ONLY ADDITION) -->
+                <a href="{% url 'submit-feedback' %}" class="dashboard-action-button">
+                    <i class="fas fa-comment-dots"></i>
+                    <span>Give Feedback</span>
+                </a>
+
             </div>
         </div>
 
@@ -152,14 +153,13 @@
             </div>
 
             <div id="recent-notes-container">
-                <!-- Content injected via JS -->
                 <p class="muted" style="text-align:center;">Loading notes...</p>
             </div>
 
             <div style="margin-top:auto; text-align:right; padding-top:10px;">
-                <a href="#"
-                    style="color:var(--theme-brown); font-weight:700; font-size:0.9rem; text-decoration:none;">View
-                    All History →</a>
+                <a href="#" style="color:var(--theme-brown); font-weight:700; font-size:0.9rem; text-decoration:none;">
+                    View All History →
+                </a>
             </div>
         </div>
 
@@ -252,10 +252,7 @@ function renderSelfTrendDashboard(patientDaily) {
                 y: {
                     beginAtZero: true,
                     max: 10,
-                    title: {
-                        display: true,
-                        text: "Score (0–10)"
-                    }
+                    title: { display: true, text: "Score (0–10)" }
                 }
             }
         }
@@ -267,7 +264,5 @@ function showEmptyState() {
     document.getElementById("chart-empty-state").style.display = "block";
 }
 </script>
-
-
 
 {% endblock content %}

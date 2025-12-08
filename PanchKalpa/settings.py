@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Installed manually
     'accounts',
     'Patient',
@@ -50,10 +50,10 @@ INSTALLED_APPS = [
     'progress',
     'billing',
     'chat',
-    # 'aiassistant',
-    
-
+    'therapy',      # <-- REQUIRED
+    'feedback',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

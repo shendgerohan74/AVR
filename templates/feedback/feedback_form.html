@@ -1,0 +1,160 @@
+{% extends "patient-portal/base.html" %}
+{% load static %}
+
+{% block title %}Therapy Feedback{% endblock title %}
+
+{% block style %}
+<link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap"
+    rel="stylesheet">
+
+<style>
+    .feedback-page-container {
+        max-width: 900px;
+        margin: 50px auto;
+        padding: 40px;
+        background: #ffffff;
+        border-radius: 25px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+        border: 1px solid #f0e5d8;
+    }
+
+    .feedback-title {
+        font-size: 2.4rem;
+        text-align: center;
+        font-weight: 700;
+        color: var(--theme-brown);
+        margin-bottom: 35px;
+        font-family: "Playfair Display";
+    }
+
+    .feedback-form-group {
+        margin-bottom: 22px;
+    }
+
+    .feedback-label {
+        font-weight: 600;
+        color: var(--theme-brown);
+        font-size: 1rem;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .feedback-field {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #fffdf8;
+        border: 1px solid #d8c9b8;
+        font-size: 1rem;
+        outline: none;
+        display: block;
+    }
+
+    .therapy-select {
+        max-height: 140px;
+        overflow-y: auto;
+    }
+
+    .feedback-textarea {
+        height: 140px;
+        resize: none;
+    }
+
+    .submit-feedback-btn {
+        background: var(--theme-brown);
+        color: white;
+        padding: 14px 28px;
+        border-radius: 30px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        margin-top: 20px;
+        width: 260px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        transition: 0.25s;
+    }
+
+    .submit-feedback-btn:hover {
+        background: #5c2f0d;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="feedback-page-container">
+
+    <div class="feedback-title">Therapy Feedback 📝</div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Therapy -->
+        <div class="feedback-form-group">
+            <label class="feedback-label">Therapy</label>
+            <select name="therapy" class="feedback-field therapy-select">
+                <option value="">-- Select Therapy --</option>
+                <option value="Vamana">Vamana</option>
+                <option value="Virechana">Virechana</option>
+                <option value="Basti">Basti</option>
+                <option value="Nasya">Nasya</option>
+                <option value="Raktamokshana">Raktamokshana</option>
+            </select>
+        </div>
+
+        <!-- Therapist -->
+        <div class="feedback-form-group">
+            <label class="feedback-label">Therapist</label>
+            {{ form.therapist }}
+        </div>
+
+        <!-- Rating -->
+        <div class="feedback-form-group">
+            <label class="feedback-label">Overall Rating (1–5)</label>
+            {{ form.rating }}
+        </div>
+
+        <!-- Pain Change -->
+        <div class="feedback-form-group">
+            <label class="feedback-label">Pain Change</label>
+            {{ form.pain_change }}
+        </div>
+
+        <!-- Stress Change -->
+        <div class="feedback-form-group">
+            <label class="feedback-label">Stress Change</label>
+            {{ form.stress_change }}
+        </div>
+
+        <!-- Sleep Change -->
+        <div class="feedback-form-group">
+            <label class="feedback-label">Sleep Change</label>
+            {{ form.sleep_change }}
+        </div>
+
+        <!-- Communication -->
+        <div class="feedback-form-group">
+            <label class="feedback-label">Communication Rating</label>
+            {{ form.communication_rating }}
+        </div>
+
+        <!-- Comfort -->
+        <div class="feedback-form-group">
+            <label class="feedback-label">Comfort Level</label>
+            {{ form.comfort_level }}
+        </div>
+
+        <!-- Additional Feedback -->
+        <div class="feedback-form-group">
+            <label class="feedback-label">Additional Feedback</label>
+            {{ form.feedback_text }}
+        </div>
+
+        <button type="submit" class="submit-feedback-btn">Submit Feedback</button>
+
+    </form>
+</div>
+{% endblock content %}

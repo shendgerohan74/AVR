@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Chat</title>
+</head>
+<body>
+
+<h2>🎤 Voice Chat Demo</h2>
+
+<button id="micBtn">🎙 Speak</button>
+
+<p><b>You said:</b> <span id="userText"></span></p>
+<p><b>Bot reply:</b> <span id="botReply"></span></p>
+
+<script>
+const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = "en-IN";
+
+document.getElementById("micBtn").onclick = () => {
+    recognition.start();
+};
+
+recognition.onresult = (event) => {
+    let text = event.results[0][0].transcript;
+    document.getElementById("userText").innerText = text;
+
+    // Send text to Django API
+    fetch("/api/voice/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("botReply").innerText = data.reply;
+
+        // Speak the reply
+        let speech = new SpeechSynthesisUtterance(data.reply);
+        speech.lang = "en-IN";
+        window.speechSynthesis.speak(speech);
+    });
+};
+</script>
+
+</body>
+</html>
