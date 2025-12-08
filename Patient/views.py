@@ -163,6 +163,7 @@ from .models import Appointment
 from django.shortcuts import render, get_object_or_404
 from Patient.models import Appointment
 
+
 def appointment_detail(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk, patient=request.user.patientprofile)
 
@@ -170,7 +171,7 @@ def appointment_detail(request, pk):
     instructions = {
         "Panchakarma": {
             "pre_care": """
-1.Follow light, easily digestible diet for at least 2 days <br>
+1.Follow light, easily digestible diet for at least 2 days
 2.Avoid heavy, oily, fried food
 3.Sleep well the previous night
 4.Drink warm water regularly
@@ -265,15 +266,19 @@ def appointment_detail(request, pk):
         },
     }
 
-    # Get instructions for this therapy
+    # Get raw instructions
     therapy_name = appointment.therapy.name
-    pre_care = instructions.get(therapy_name, {}).get("pre_care", "No pre-care instructions available.")
-    post_care = instructions.get(therapy_name, {}).get("post_care", "No post-care instructions available.")
+    pre_raw = instructions.get(therapy_name, {}).get("pre_care", "")
+    post_raw = instructions.get(therapy_name, {}).get("post_care", "")
+
+    # Convert text block -> list of clean lines
+    pre_care_list = [line.strip() for line in pre_raw.split("\n") if line.strip()]
+    post_care_list = [line.strip() for line in post_raw.split("\n") if line.strip()]
 
     return render(request, "patient-portal/appointment_detail.html", {
         "appointment": appointment,
-        "pre_care": pre_care,
-        "post_care": post_care,
+        "pre_care_list": pre_care_list,
+        "post_care_list": post_care_list,
     })
 
 PRAKRITI_QUESTIONS = [

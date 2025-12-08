@@ -9,7 +9,7 @@
         Appointment Details
     </div>
 
-    <h2>{{ appointment.therapy.name }}</h2>
+    <h2 style="text-align:center; margin-bottom:10px;">{{ appointment.therapy.name }}</h2>
 
     <p><strong>Therapist:</strong> {{ appointment.therapist.name }}</p>
     <p><strong>Date:</strong> {{ appointment.date }}</p>
@@ -17,28 +17,65 @@
 
     <hr>
 
+    <!-- PRE CARE CARD -->
     <div class="instructions-card">
-    <h2>Pre-Care Instructions</h2>
-    <div class="instructions-content">
-        {% for line in pre_care.splitlines %}
-            {% if line.strip %}
-                <div class="instruction-item">{{ line }}</div>
-            {% endif %}
-        {% endfor %}
+        <h2 class="instructions-title">Pre-Care Instructions</h2>
+
+        <div class="instructions-content">
+            {% for step in pre_care_list %}
+                <div class="instruction-item">{{ step }}</div>
+            {% empty %}
+                <div class="instruction-item">No pre-care instructions available.</div>
+            {% endfor %}
+        </div>
     </div>
+
+    <!-- POST CARE CARD -->
+    <div class="instructions-card">
+        <h2 class="instructions-title">Post-Care Instructions</h2>
+
+        <div class="instructions-content">
+            {% for step in post_care_list %}
+                <div class="instruction-item">{{ step }}</div>
+            {% empty %}
+                <div class="instruction-item">No post-care instructions available.</div>
+            {% endfor %}
+        </div>
+    </div>
+
 </div>
 
-<div class="instructions-card">
-    <h2>Post-Care Instructions</h2>
-    <div class="instructions-content">
-        {% for line in post_care.splitlines %}
-            {% if line.strip %}
-                <div class="instruction-item">{{ line }}</div>
-            {% endif %}
-        {% endfor %}
-    </div>
-</div>
+<style>
+    .instructions-card {
+        width: 90%;
+        max-width: 700px;
+        margin: 25px auto;
+        background: #fff;
+        padding: 20px 25px;
+        border-radius: 12px;
+        box-shadow: 0px 3px 10px rgba(0,0,0,0.12);
+        text-align: center;
+    }
 
+    .instructions-title {
+        font-size: 1.6rem;
+        color: var(--theme-gold-dark);
+        margin-bottom: 15px;
+    }
 
+    .instructions-content {
+        text-align: left;
+        margin-top: 10px;
+    }
+
+    .instruction-item {
+        background: #f7f2e8;
+        padding: 10px 14px;
+        margin: 6px 0;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        line-height: 1.4;
+    }
+</style>
 
 {% endblock %}
