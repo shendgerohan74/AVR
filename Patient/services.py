@@ -1,3 +1,13 @@
+from django.http import HttpResponse
+from Patient.utils import send_notification
+
+def some_view(request):
+    patient_id = 5  # example
+    send_notification(patient_id, "Therapy Scheduled", "Your Abhyanga session is booked for tomorrow at 10 AM.")
+
+    return HttpResponse("Notification sent")
+
+
 def generate_diet_plan(prakriti, stage="none", symptoms=None):
     symptoms = symptoms or []
 

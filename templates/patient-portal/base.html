@@ -54,8 +54,7 @@
                 class="dashboard-nav-item-button {% block teleconsult %}{% endblock teleconsult %}"><i
                     class="fa-solid fa-headset"></i>
                 Tele-Consult</a>
-            <a href="{% url 'prakriti_test' %}"
-                class="dashboard-nav-item-button {% block diet %}{% endblock diet %}"><i
+            <a href="{% url 'prakriti_test' %}" class="dashboard-nav-item-button {% block diet %}{% endblock diet %}"><i
                     class="fa-solid fa-carrot"></i>
                 Test your prakriti</a>
         </div>
@@ -85,7 +84,7 @@
                 </button>
 
                 <div class="notify-popup-window" id="notifyPopup">
-                    <div class="notify-header-bar">
+                    <div class="chatbot-header">
                         <h3 class="notify-header-title">Notifications</h3>
                         <button class="notify-action-link" onclick="markAllNotifyRead()">Mark all read</button>
                     </div>
@@ -118,11 +117,11 @@
 
     <!-- 🔥 CHATBOT FLOATING BUTTON -->
     <div id="chatbot-button">
-        <img id="chatbot-avatar" src="{% static "assets/AyurMitra-logo.png" %}" alt="Chatbot">
+        <img id="chatbot-avatar" src="{% static 'assets/AyurMitra-logo.png' %}" alt="Chatbot">
     </div>
 
     <!-- 🔥 CHATBOT POPUP WINDOW -->
-    <div id="chatbot-popup">    
+    <div id="chatbot-popup">
         <div class="chatbot-header">
             <span>Chat Support</span>
             <button id="chatbot-close">&times;</button>
@@ -142,6 +141,8 @@
 
     {% block content %}{% endblock content %}
     <script>
+        console.log("SCRIPT LOADED");
+
         document.querySelector(".mobile-menu-toggle")?.addEventListener("click", () => {
             const panel = document.querySelector(".mobile-menu-panel");
             panel.style.display = panel.style.display === "flex" ? "none" : "flex";
@@ -189,10 +190,10 @@
             chatInput.value = "";
 
             let sessionId = localStorage.getItem("sessionId");
-if (!sessionId) {
-    sessionId = crypto.randomUUID();
-    localStorage.setItem("sessionId", sessionId);
-}
+            if (!sessionId) {
+                sessionId = crypto.randomUUID();
+                localStorage.setItem("sessionId", sessionId);
+            }
 
 
             // Show "typing..."
@@ -210,7 +211,7 @@ if (!sessionId) {
                     body: JSON.stringify({ message, sessionId })
                 });
 
-                const data = await res.json();  
+                const data = await res.json();
 
                 // Remove typing
                 typingEl.remove();
@@ -232,9 +233,84 @@ if (!sessionId) {
                 console.error(error);
             }
         }
-    </script>
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let c of cookies) {
+                    const cookie = c.trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+
+        async function loadNotifications() {
+            const container = document.getElementById("notify-content");
+            container.innerHTML = "<div style='padding:20px; text-align:center;'>Loading...</div>";
+
+            try {
+                const response = await fetch("/patient/api/notifications/");
+                const data = await response.json();
+
+                // Update badge
+                const badge = document.getElementById("notify-badge");
+                if (data.unread > 0) {
+                    badge.style.display = "inline-block";
+                    badge.textContent = data.unread;
+                } else {
+                    badge.style.display = "none";
+                }
+
+                if (data.notifications.length === 0) {
+                    container.innerHTML = "<div style='padding:20px; text-align:center; color:#999;'>No notifications</div>";
+                    return;
+                }
+
+                container.innerHTML = data.notifications.map(n => `
+            <div class="notify-item ${n.is_read ? '' : 'unread'}">
+                <h4 class="notify-title">${n.title}</h4>
+                <p class="notify-message">${n.message}</p>
+                <span class="notify-time">${n.created_at}</span>
+            </div>
+        `).join("");
+
+            } catch (err) {
+                container.innerHTML = "<div style='padding:20px; text-align:center; color:red;'>Failed to load</div>";
+            }
+        }
+
+        function toggleNotifyPopup() {
+            const popup = document.getElementById("notifyPopup");
+            popup.classList.toggle("active");
+
+            if (popup.classList.contains("active")) {
+                loadNotifications();
+            }
+        }
+
+        async function markAllNotifyRead() {
+            await fetch("/patient/api/notifications/read_all/", {
+                method: "POST",
+                headers: { "X-CSRFToken": csrftoken }
+            });
+
+            loadNotifications();
+        }
+
+        window.toggleNotifyPopup = toggleNotifyPopup;
+        window.loadNotifications = loadNotifications;
+        window.markAllNotifyRead = markAllNotifyRead;
+
 
     </script>
+
 
 </body>
 

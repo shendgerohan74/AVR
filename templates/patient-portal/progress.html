@@ -287,13 +287,12 @@
                 "X-CSRFToken": getCookie("csrftoken")
             },
             credentials: "include",
-            body: JSON.stringify({
-                pain: 3,
-                stress: 5,
-                sleep: 7,
-            })
+            body: JSON.stringify(payload),
+            
+            
         });
-
+        
+        console.log(payload);
 
         if (res.ok) {
             alert("Saved!");
