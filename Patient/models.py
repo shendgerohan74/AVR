@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from therapist.models import Therapist, Therapy
 from django.conf import settings
+from django.db import models
+from django.contrib.auth.models import User
+
 
 
 
@@ -50,3 +53,20 @@ class NotificationAPIKey(models.Model):
     name = models.CharField(max_length=100)
     key = models.CharField(max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
+        
+
+
+from django.db import models
+
+# Patient/models.py
+class ConsentForm(models.Model):
+    patient_name = models.CharField(max_length=200)
+    age = models.IntegerField()
+    contact = models.CharField(max_length=15)
+    therapy_name = models.CharField(max_length=100)
+    therapy_description = models.TextField()
+    understood_risks = models.BooleanField()
+    voluntary = models.BooleanField()
+    notes = models.TextField(blank=True, null=True)
+    signature = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
