@@ -18,6 +18,7 @@ Including another URLconf
 # from django.urls import path, include
 # from accounts.views import landing_page, therapist_login
 
+
 # urlpatterns = [
 #     path('', landing_page, name='landing'),
 #     path('', include('progress.urls')),
@@ -35,6 +36,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from accounts.views import landing_page   # ONLY THIS
+from Patient.views import consent_form_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -55,5 +57,7 @@ urlpatterns = [
     path("progress/", include("progress.urls")),
     
     # path("ai-assistant/", include("ai-assistant.urls")),
+    path("consent/", consent_form_view, name="consent_form"),
+
 
 ]

@@ -268,6 +268,22 @@ function showEmptyState() {
 }
 </script>
 
+<h2>Submitted Consent Forms</h2>
+{% if consents %}
+    <ul>
+        {% for consent in consents %}
+            <li>
+                {{ consent.therapy_name }} - Submitted on {{ consent.created_at|date:"d M Y H:i" }}
+                {% if consent.pdf_file %}
+                    - <a href="{{ consent.pdf_file.url }}" target="_blank">Download PDF</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No consent forms submitted yet.</p>
+{% endif %}
+
 
 
 {% endblock content %}

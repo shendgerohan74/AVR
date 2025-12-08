@@ -1,0 +1,157 @@
+{% extends "patient-portal/base.html" %}
+{% load static %}
+
+{% block title %}Consent Form{% endblock title %}
+
+{% block style %}
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'css/patient-portal/appointments.css' %}">
+
+    <style>
+        /* Extra styling for consent page only */
+        
+        .consent-container {
+            width: 100%;
+            margin: auto;
+        }
+
+        .consent-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--theme-heading);
+        }
+
+        .consent-label {
+            font-family: 'Lato', sans-serif;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .consent-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-family: 'Lato', sans-serif;
+        }
+    </style>
+{% endblock style %}
+
+{% block content %}
+
+<div class="appointments-main-container">
+
+    <div class="appointments-page-header">
+        <h1 class="appointments-page-title">Patient Consent Form</h1>
+    </div>
+
+    <div class="appointments-content-card consent-container">
+
+        {% if message %}
+            <div style="color:green; font-weight:600; text-align:center; margin-bottom:15px;">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="booking-form-group">
+                <label class="consent-label">Patient Full Name</label>
+                <input type="text" class="booking-input-date" name="patient_name" required>
+            </div>
+
+            <div class="booking-form-group">
+                <label class="consent-label">Age</label>
+                <input type="number" class="booking-input-date" name="age" required>
+            </div>
+
+            <div class="booking-form-group">
+                <label class="consent-label">Contact Number</label>
+                <input type="text" class="booking-input-date" name="contact" required>
+            </div>
+
+            <div class="booking-form-group">
+                <label class="consent-label">Select Therapist</label>
+                <select class="booking-input-select" name="therapist_name" required>
+                    <option value="">-- Select Therapist --</option>
+                    <option>Dr. Aditi Sharma</option>
+                    <option>Dr. Rohan Mehta</option>
+                    <option>Dr. Kavya Iyer</option>
+                    <option>Dr. Arjun Patil</option>
+                    <option>Dr. Sneha Joshi</option>
+                    <option>Dr. Karan Deshmukh</option>
+                    <option>Dr. Priya Nair</option>
+                    <option>Dr. Varun Kapoor</option>
+                </select>
+            </div>
+
+            <div class="booking-form-group">
+                <label class="consent-label">Select Therapy</label>
+                <select class="booking-input-select" name="therapy_name" id="therapy_name" onchange="setDescription()" required>
+                    <option value="">-- Select Therapy --</option>
+                    <option value="Vamana" data-desc="Therapeutic emesis to eliminate excess Kapha from the body.">Vamana</option>
+                    <option value="Virechana" data-desc="Purgation therapy to remove excess Pitta from the body.">Virechana</option>
+                    <option value="Basti" data-desc="Medicinal enema therapy to balance Vata dosha.">Basti</option>
+                    <option value="Nasya" data-desc="Nasal administration of medicated oils for head & sinus disorders.">Nasya</option>
+                    <option value="Raktamokshana" data-desc="Therapeutic bloodletting for blood purification.">Raktamokshana</option>
+                    <option value="Shirodhara" data-desc="Continuous oil flow on the forehead for relaxation & stress relief.">Shirodhara</option>
+                </select>
+            </div>
+
+            <div class="booking-form-group">
+                <label class="consent-label">Therapy Description</label>
+                <textarea name="therapy_description" id="therapy_description" rows="3" readonly></textarea>
+            </div>
+
+            <label class="consent-label">Important Agreements:</label>
+            <div class="consent-checkbox">
+                <input type="checkbox" name="understood_risks" required>
+                <span>I understand the risks associated with this therapy.</span>
+            </div>
+
+            <div class="consent-checkbox">
+                <input type="checkbox" name="voluntary" required>
+                <span>I am giving this consent voluntarily.</span>
+            </div>
+
+            <div class="booking-form-group">
+                <label class="consent-label">Additional Notes (Optional)</label>
+                <textarea name="notes"></textarea>
+            </div>
+
+            <div class="booking-form-group">
+                <label class="consent-label">Digital Signature (Type your full name)</label>
+                <input type="text" class="booking-input-date" name="signature" required>
+            </div>
+
+            <button type="submit" class="booking-submit-btn">Submit Consent Form</button>
+
+        </form>
+    </div>
+
+</div>
+
+
+<script>
+function setDescription() {
+    const therapySelect = document.getElementById("therapy_name");
+    const desc = therapySelect.options[therapySelect.selectedIndex].getAttribute("data-desc");
+    document.getElementById("therapy_description").value = desc || "";
+}
+</script>
+
+{% endblock content %}

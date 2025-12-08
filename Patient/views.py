@@ -23,9 +23,11 @@ def dashboard(request):
         date__lt=timezone.now().date()
     ).order_by("-date")
 
+    
     return render(request, "patient-portal/dashboard.html", {
         "upcoming": upcoming,
-        "history": history
+        "history": history,
+        "consents": consents
     })
         
 
@@ -315,3 +317,70 @@ def prakriti_result(request):
         "kapha": kapha,
         "dominant": dosha
     })
+
+   # Consent Form
+# ------------------ CONSENT FORM (One-page HTML) ------------------
+# Patient/views.py
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+import pdfkit
+from .models import ConsentForm
+from therapist.models import Therapy
+
+def consent_form_view(request):
+    message = ""
+    if request.method == "POST":
+        patient_name = request.POST.get("patient_name")
+        age = request.POST.get("age")
+        contact = request.POST.get("contact")
+        therapist_name = request.POST.get("therapist_name")
+        therapy_name = request.POST.get("therapy_name")
+        notes = request.POST.get("notes")
+        signature = request.POST.get("signature")
+        understood_risks = request.POST.get("understood_risks") == "on"
+        voluntary = request.POST.get("voluntary") == "on"
+
+        # Get therapy description automatically
+        try:
+            therapy = Therapy.objects.get(name=therapy_name)
+            therapy_description = therapy.description
+        except Therapy.DoesNotExist:
+            therapy_description = ""
+
+        # Save to database
+        consent = ConsentForm.objects.create(
+            patient_name=patient_name,
+            age=age,
+            contact=contact,
+            therapy_name=therapy_name,
+            therapy_description=therapy_description,
+            understood_risks=understood_risks,
+            voluntary=voluntary,
+            notes=notes,
+            signature=signature
+        )
+
+        message = "Consent form submitted successfully!"
+
+        # Generate PDF
+        config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+        context = {
+            "patient_name": patient_name,
+            "age": age,
+            "contact": contact,
+            "therapy_name": therapy_name,
+            "therapist_name": therapist_name,
+            "therapy_description": therapy_description,
+            "notes": notes,
+            "signature": signature,
+        }
+        html = render_to_string("patient-portal/consent_pdf.html", context)
+        pdf = pdfkit.from_string(html, False, configuration=config)
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="consent_form.pdf"'
+        return response
+        return redirect('/dashboard/')
+
+    return render(request, "patient-portal/consent_form.html", {"message": message})
