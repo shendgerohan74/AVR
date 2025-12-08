@@ -54,6 +54,10 @@
                 class="dashboard-nav-item-button {% block teleconsult %}{% endblock teleconsult %}"><i
                     class="fa-solid fa-headset"></i>
                 Tele-Consult</a>
+            <a href="{% url 'prakriti_test' %}"
+                class="dashboard-nav-item-button {% block diet %}{% endblock diet %}"><i
+                    class="fa-solid fa-carrot"></i>
+                Test your prakriti</a>
         </div>
 
         <!--  🔥 MOBILE MENU PANEL  -->
@@ -64,6 +68,7 @@
             <a href="{% url 'billing:billing-home' %}">Billing</a>
             <a href="{% url 'patient-teleconsult' %}">Tele-Consult</a>
             <a href="{% url 'patient-profile' %}">Profile</a>
+            <a href="{% url 'prakriti_test' %}">Test your Prakriti</a>
             <a href="{% url 'logout' %}">Logout</a>
         </div>
 

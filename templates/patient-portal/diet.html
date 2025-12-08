@@ -1,0 +1,212 @@
+{% extends "patient-portal/base.html" %}
+{% load static %}
+
+{% block diet %}active{% endblock diet %}
+{% block title %}Diet & Lifestyle Planner{% endblock title %}
+
+{% block style %}
+<link
+  href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap"
+  rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<link rel="stylesheet" href="{% static 'css/patient-portal/dashboard.css' %}">
+<style>
+    .diet-section-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .diet-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .diet-card h3 {
+        font-size: 1.2rem;
+        margin: 0;
+        color: var(--theme-brown);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .diet-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+
+    .diet-list li::before {
+        content: "• ";
+        color: var(--theme-gold-dark);
+        font-weight: bold;
+    }
+
+    .diet-highlight {
+        background: #fff5d8;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        color: var(--theme-brown);
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+
+<div class="dashboard-main-container">
+
+    <!-- HEADER -->
+    <div class="dashboard-page-header">
+        <div>
+            <h1 class="dashboard-welcome-title">Your Personalized Diet Plan 🥗</h1>
+            <div class="dashboard-current-date">{% now "l, d F Y" %}</div>
+        </div>
+    </div>
+
+    <div class="dashboard-layout-grid">
+
+        <!-- DOSHA SUMMARY CARD -->
+        <div class="dashboard-content-card dashboard-col-span-4">
+            <div class="dashboard-card-header-title">
+                <i class="fas fa-leaf" style="color:var(--theme-gold-dark)"></i>
+                Your Prakriti Type
+            </div>
+
+            {% if prakriti %}
+            <div class="diet-highlight">
+                <strong>{{ prakriti }}</strong> — This plan is generated based on your Ayurvedic body type.
+            </div>
+            {% else %}
+            <div class="diet-highlight">Run the Prakriti Analyzer to unlock your personalized diet.</div>
+            {% endif %}
+        </div>
+
+        <!-- MEAL PLAN -->
+        <div class="dashboard-content-card dashboard-col-span-8">
+            <div class="dashboard-card-header-title">
+                <i class="fas fa-utensils" style="color:var(--theme-gold-dark)"></i>
+                Daily Meal Plan
+            </div>
+
+            <div class="diet-section-grid">
+
+                <div class="diet-card">
+                    <h3><i class="fas fa-sun"></i> Breakfast</h3>
+                    <ul class="diet-list" id="breakfast-list">
+                        <li>Loading...</li>
+                    </ul>
+                </div>
+
+                <div class="diet-card">
+                    <h3><i class="fas fa-cloud-sun"></i> Lunch</h3>
+                    <ul class="diet-list" id="lunch-list">
+                        <li>Loading...</li>
+                    </ul>
+                </div>
+
+                <div class="diet-card">
+                    <h3><i class="fas fa-moon"></i> Dinner</h3>
+                    <ul class="diet-list" id="dinner-list">
+                        <li>Loading...</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SNACKS + DRINKS -->
+        <div class="dashboard-content-card dashboard-col-span-6">
+            <div class="dashboard-card-header-title">
+                <i class="fas fa-mug-hot" style="color:var(--theme-gold-dark)"></i>
+                Herbal Drinks & Snacks
+            </div>
+
+            <h3 style="color:var(--theme-brown); margin-top:0;">Recommended Drinks</h3>
+            <ul class="diet-list" id="drinks-list">
+                <li>Loading...</li>
+            </ul>
+
+            <h3 style="color:var(--theme-brown); margin-top:18px;">Healthy Snacks</h3>
+            <ul class="diet-list" id="snacks-list">
+                <li>Loading...</li>
+            </ul>
+        </div>
+
+        <!-- LIFESTYLE PLAN -->
+        <div class="dashboard-content-card dashboard-col-span-6">
+            <div class="dashboard-card-header-title">
+                <i class="fas fa-spa" style="color:var(--theme-gold-dark)"></i>
+                Yoga & Lifestyle Routine
+            </div>
+
+            <h3 style="color:var(--theme-brown); margin-top:0;">Daily Routine</h3>
+            <ul class="diet-list" id="routine-list">
+                <li>Loading...</li>
+            </ul>
+
+            <h3 style="color:var(--theme-brown); margin-top:18px;">Sleep Instructions</h3>
+            <ul class="diet-list" id="sleep-list">
+                <li>Loading...</li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<!-- SCRIPT TO LOAD DATA -->
+<script>
+document.addEventListener("DOMContentLoaded", loadDietPlan);
+
+async function loadDietPlan() {
+    try {
+        const res = await fetch("/api/diet/plan/", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include"
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        updateList("breakfast-list", data.meals.breakfast);
+        updateList("lunch-list", data.meals.lunch);
+        updateList("dinner-list", data.meals.dinner);
+
+        updateList("drinks-list", data.drinks);
+        updateList("snacks-list", data.snacks);
+
+        updateList("routine-list", data.routine);
+        updateList("sleep-list", data.sleep);
+
+    } catch (e) {
+        console.error("Diet plan error:", e);
+    }
+}
+
+function updateList(elementId, items) {
+    const el = document.getElementById(elementId);
+    el.innerHTML = "";
+
+    if (!items || items.length === 0) {
+        el.innerHTML = "<li>No data.</li>";
+        return;
+    }
+
+    items.forEach(i => {
+        const li = document.createElement("li");
+        li.textContent = i;
+        el.appendChild(li);
+    });
+}
+</script>
+
+{% endblock content %}

@@ -10,4 +10,9 @@ urlpatterns = [
     path("appointments/", views.appointments, name="patient-appointments"),
     path('progress/', views.progress, name='patient-progress'),
     path('teleconsult/', views.teleconsult, name='patient-teleconsult'),
+    path("api/diet/plan/", views.diet_plan_api, name="diet_plan_api"),
+    path("predict/", views.prakriti_test, name="prakriti_test"),
+    path("predict/submit/", views.prakriti_submit, name="prakriti_submit"),
+    path("predict/result/", views.prakriti_result, name="prakriti_result"),
+
 ]

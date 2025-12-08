@@ -18,7 +18,9 @@ class PatientProfile(models.Model):
     gender = models.CharField(max_length=10, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     allergies = models.CharField(max_length=255, null=True, blank=True)
-
+    prakriti_type = models.CharField(max_length=20, null=True, blank=True)
+    therapy_stage = models.CharField(max_length=20, null=True, blank=True)  
+    symptoms = models.JSONField(default=list, blank=True)
     def __str__(self):
         return self.user.username
 

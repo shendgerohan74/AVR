@@ -26,12 +26,15 @@
         <!-- 1. HEADER (Photo, Name, Age, Gender) -->
         <div class="profile-header-section">
             <div class="profile-photo-wrapper">
-                <img src="https://via.placeholder.com/150" alt="Profile Photo" class="profile-avatar-img"
-                    id="view-photo">
-                <label class="profile-upload-overlay">
+                <!-- <img src="https://via.placeholder.com/150" alt="Profile Photo" class="profile-avatar-img"
+                    id="view-photo"> -->
+                <!-- <label class="profile-upload-overlay">
                     <i class="fas fa-camera"></i>
                     <input type="file" style="display:none;" id="input-photo">
-                </label>
+                </label> -->
+                <div id="profile-icon">
+                    {{ request.user.first_name|default:"A"|slice:":1" }}
+                </div>
             </div>
 
             <div class="profile-basic-info">

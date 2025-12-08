@@ -1,0 +1,79 @@
+{% extends "patient-portal/base.html" %}
+{% load static %}
+
+{% block diet %}active{% endblock diet %}
+
+
+{% block style %}
+<!-- Fonts (same as progress page) -->
+<link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap"
+    rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<!-- Main Page CSS -->
+<link rel="stylesheet" href="{% static 'css/patient-portal/progress.css' %}">
+
+{% endblock style %}
+
+{% block content %}
+
+<div class="progress-main-container">
+
+    <div class="progress-content-card">
+        
+        <!-- Main Card -->
+        <div class="card p-4" style="border-radius: 14px; background: #fffdf7;">
+        
+        <h2 class="mb-4 progress-card-header">
+            <i class="fas fa-leaf" style="color:var(--theme-gold-dark);"></i>
+            Prakriti Test
+        </h2>
+
+        <p class="text-muted mb-4">Select the option that best describes you.</p>
+
+        <form action="{% url 'prakriti_submit' %}" method="POST">
+            {% csrf_token %}
+            
+            {% for q in questions %}
+            
+            <!-- Question box -->
+            <div class="p-3 mb-3 progress-report-container"
+                 style="
+                    border: 1px solid #F4D37B; 
+                    border-radius: 10px;
+                    background: #fffaf0;
+                 ">
+
+                <h5 class="mb-2 progress-section-title progress" style="font-weight: 900;">
+                    {{ forloop.counter }}. {{ q.question }}
+                </h5>
+
+                <label class="d-block mb-1">
+                    <input type="radio" name="q{{ forloop.counter }}" value="vata" required>
+                    {{ q.vata }}
+                </label>
+
+                <label class="d-block mb-1">
+                    <input type="radio" name="q{{ forloop.counter }}" value="pitta">
+                    {{ q.pitta }}
+                </label>
+
+                <label class="d-block">
+                    <input type="radio" name="q{{ forloop.counter }}" value="kapha">
+                    {{ q.kapha }}
+                </label>
+            </div>
+
+            {% endfor %}
+            
+            <button class="progress-submit-btn mt-3" type="submit">
+                <i class="fas fa-check-circle"></i> Submit Test
+            </button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock content %}
