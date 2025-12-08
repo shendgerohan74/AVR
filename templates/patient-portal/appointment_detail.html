@@ -1,0 +1,44 @@
+{% extends "patient-portal/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="appointments-content-card">
+    <div class="appointments-card-header">
+        <i class="fas fa-info-circle" style="color:var(--theme-gold-dark)"></i>
+        Appointment Details
+    </div>
+
+    <h2>{{ appointment.therapy.name }}</h2>
+
+    <p><strong>Therapist:</strong> {{ appointment.therapist.name }}</p>
+    <p><strong>Date:</strong> {{ appointment.date }}</p>
+    <p><strong>Time:</strong> {{ appointment.time }}</p>
+
+    <hr>
+
+    <div class="instructions-card">
+    <h2>Pre-Care Instructions</h2>
+    <div class="instructions-content">
+        {% for line in pre_care.splitlines %}
+            {% if line.strip %}
+                <div class="instruction-item">{{ line }}</div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<div class="instructions-card">
+    <h2>Post-Care Instructions</h2>
+    <div class="instructions-content">
+        {% for line in post_care.splitlines %}
+            {% if line.strip %}
+                <div class="instruction-item">{{ line }}</div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+
+
+{% endblock %}

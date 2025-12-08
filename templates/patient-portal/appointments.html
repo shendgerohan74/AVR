@@ -81,17 +81,30 @@
                 <div id="upcoming-list">
                     {% if upcoming %}
                         {% for appt in upcoming %}
-                        <div class="appointment-list-item">
-                            <div class="appointment-info">
-                                <h4>{{ appt.therapy.name }}</h4>
-                                <div class="appointment-meta">
-                                    <span><i class="far fa-calendar"></i> {{ appt.date }}</span>
-                                    <span><i class="far fa-clock"></i> {{ appt.time }}</span>
-                                </div>
-                                <div style="font-size:0.8rem; color:var(--theme-muted);">{{ appt.therapist.name }}</div>
-                            </div>
-                        </div>
-                        {% endfor %}
+    <div class="appointment-list-item">
+        <div class="appointment-info">
+            <h4>{{ appt.therapy.name }}</h4>
+
+            <div class="appointment-meta">
+                <span><i class="far fa-calendar"></i> {{ appt.date }}</span>
+                <span><i class="far fa-clock"></i> {{ appt.time }}</span>
+            </div>
+
+            <div style="font-size:0.8rem; color:var(--theme-muted);">
+                {{ appt.therapist.name }}
+            </div>
+
+            <!-- ⭐ ADD THIS BUTTON HERE -->
+            <a href="{% url 'appointment-detail' appt.id %}"
+               class="booking-submit-btn"
+               style="margin-top: 10px; display:inline-block;">
+                View Details
+            </a>
+
+        </div>
+    </div>
+{% endfor %}
+
                     {% else %}
                         <p style="text-align:center; color:#999;">No upcoming appointments.</p>
                     {% endif %}

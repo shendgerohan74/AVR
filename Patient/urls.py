@@ -14,5 +14,6 @@ urlpatterns = [
     path("predict/", views.prakriti_test, name="prakriti_test"),
     path("predict/submit/", views.prakriti_submit, name="prakriti_submit"),
     path("predict/result/", views.prakriti_result, name="prakriti_result"),
+    path("appointments/<int:pk>/", views.appointment_detail, name="appointment-detail"),
 
 ]

@@ -18,6 +18,17 @@ def dashboard(request):
         date__gte=timezone.now().date()
     ).order_by("date")
 
+    # Add suggestions for each appointment
+    for appt in upcoming:
+        appt.suggestions = [
+            "Follow light, easily digestible diet for at least 2 days",
+            "Avoid heavy, oily, fried food",
+            "Sleep well the previous night",
+            "Drink warm water regularly",
+            "Follow physician’s instructions on internal oleation (Snehapana)",
+            "Report any digestive discomfort before therapy"
+        ]
+
     history = Appointment.objects.filter(
         patient=patient,
         date__lt=timezone.now().date()
@@ -27,7 +38,7 @@ def dashboard(request):
         "upcoming": upcoming,
         "history": history
     })
-        
+
 
 # ------------------ Appointments ------------------
 from django.contrib.auth.decorators import login_required
@@ -146,7 +157,124 @@ def diet_plan_api(request):
 
     return JsonResponse(diet, safe=False)
 
+from django.shortcuts import render, get_object_or_404
+from .models import Appointment
 
+from django.shortcuts import render, get_object_or_404
+from Patient.models import Appointment
+
+def appointment_detail(request, pk):
+    appointment = get_object_or_404(Appointment, pk=pk, patient=request.user.patientprofile)
+
+    # Ready-made instructions dictionary for all 5 therapies
+    instructions = {
+        "Panchakarma": {
+            "pre_care": """
+1.Follow light, easily digestible diet for at least 2 days <br>
+2.Avoid heavy, oily, fried food
+3.Sleep well the previous night
+4.Drink warm water regularly
+5.Follow physician's instructions on internal oleation (Snehapana)
+6.Report any digestive discomfort before therapy
+""",
+            "post_care": """
+1.Rest for 1-2 hours after therapy
+2.Drink warm water regularly
+3.Follow prescribed herbal medicines
+4.Avoid heavy, oily, fried food for 1 day
+"""
+        },
+        "Virechana": {
+            "pre_care": """
+1.Light diet for 2 days
+2.Avoid fried/oily food
+3.Follow Snehapana instructions as per physician
+4.Sleep well before therapy
+5.Report any digestive discomfort
+""",
+            "post_care": """
+1.Drink warm water regularly
+2.Rest and avoid heavy meals
+3.Follow prescribed herbs/medications
+4.Avoid strenuous activities
+"""
+        },
+        "Vamana": {
+            "pre_care": """
+1.Follow light diet for 2 days
+2.Internal oleation (Snehapana) as prescribed
+3.Avoid heavy or oily food
+4.Sleep well the night before
+5.Report nausea or discomfort
+""",
+            "post_care": """
+1.Rest adequately
+2.Avoid heavy meals
+3.Follow herbal medicine instructions
+4.Hydrate with warm water
+5.Avoid rigorous physical activity
+"""
+        },
+        "Basti": {
+            "pre_care": """
+1.Follow light diet for 2-3 days
+2.Avoid cold or heavy food
+3.Ensure proper hydration
+4.Sleep well before therapy
+5.Consult physician for any digestive issues
+""",
+            "post_care": """
+1.Rest after therapy
+2.Avoid heavy, oily, or cold food
+3.Drink warm water regularly
+4.Follow herbal or medicinal enema instructions
+5.Maintain gentle physical activity
+"""
+        },
+        "Nasya": {
+            "pre_care": """
+1.Clean nasal passages
+2.Avoid cold exposure
+3.Follow light diet
+4.Sleep adequately the night before
+5.Report any nasal infections or congestion
+""",
+            "post_care": """
+1.Avoid exposure to dust/cold winds
+2.Do not sneeze forcefully
+3.Follow herbal nasal oil instructions
+4.Rest for 30-60 minutes
+5.Avoid strenuous activity immediately
+"""
+        },
+        "Raktamokshan": {
+            "pre_care": """
+1.Avoid alcohol or blood-thinning medications
+2.Follow light diet
+3.Sleep well the previous night
+4.Ensure hydration
+5.Report any bleeding disorders
+""",
+            "post_care": """
+1.Avoid strenuous activity
+2.Keep treated area clean
+3.Apply prescribed herbal paste or dressing
+4.Rest adequately
+5.Monitor for unusual bleeding or bruising
+"""
+        },
+    }
+
+    # Get instructions for this therapy
+    therapy_name = appointment.therapy.name
+    pre_care = instructions.get(therapy_name, {}).get("pre_care", "No pre-care instructions available.")
+    post_care = instructions.get(therapy_name, {}).get("post_care", "No post-care instructions available.")
+
+    return render(request, "patient-portal/appointment_detail.html", {
+        "appointment": appointment,
+        "pre_care": pre_care,
+        "post_care": post_care,
+    })
 
 PRAKRITI_QUESTIONS = [
     {
