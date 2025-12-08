@@ -1,19 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Consent Form</title>
-</head>
-<body>
-    <h2>Consent Form</h2>
+    <meta charset="UTF-8">
+    <title>Consent Form PDF</title>
 
-    <p><strong>Patient Name:</strong> {{ patient_name }}</p>
-    <p><strong>Age:</strong> {{ age }}</p>
-    <p><strong>Contact:</strong> {{ contact }}</p>
-    <p><strong>Therapy:</strong> {{ therapy_name }}</p>
-    <p><strong>Description:</strong> {{ therapy_description }}</p>
-    <p><strong>Notes:</strong> {{ notes }}</p>
-    <p><strong>Signature:</strong> {{ signature }}</p>
-    <p><strong>Date:</strong> {{ date }}</p>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 25px;
+            background: #ffffff;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            margin-top: 18px;
+            font-weight: bold;
+            color: #444;
+            font-size: 17px;
+        }
+
+        p {
+            margin: 5px 0;
+        }
+
+        .box {
+            border: 1px solid #aaa;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f9f9f9;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Patient Consent Form</h2>
+
+    <div class="box">
+        <p><strong>Patient Name:</strong> {{ patient_name }}</p>
+        <p><strong>Age:</strong> {{ age }}</p>
+        <p><strong>Contact:</strong> {{ contact }}</p>
+    </div>
+
+    <div class="box">
+        <p><strong>Therapist:</strong> {{ therapist_name }}</p>
+        <p><strong>Therapy:</strong> {{ therapy_name }}</p>
+        <p><strong>Description:</strong> {{ therapy_description }}</p>
+    </div>
+
+    <div class="box">
+        <p><strong>Understood Risks:</strong> {{ understood_risks }}</p>
+        <p><strong>Voluntary Consent:</strong> {{ voluntary }}</p>
+    </div>
+
+    <div class="box">
+        <p><strong>Additional Notes:</strong> {{ notes }}</p>
+    </div>
+
+    <div class="box">
+        <p><strong>Digital Signature:</strong> {{ signature }}</p>
+        <p><strong>Preferred Time:</strong> {{ preferred_time }}</p>  
+        <p><strong>Date:</strong> {{ date }}</p>
+    </div>
 
 </body>
 </html>

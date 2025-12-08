@@ -340,6 +340,7 @@ def consent_form_view(request):
         signature = request.POST.get("signature")
         understood_risks = request.POST.get("understood_risks") == "on"
         voluntary = request.POST.get("voluntary") == "on"
+        preferred_time = request.POST.get("preferred_time")
 
         # Get therapy description automatically
         try:
@@ -366,15 +367,20 @@ def consent_form_view(request):
         # Generate PDF
         config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
         context = {
-            "patient_name": patient_name,
-            "age": age,
-            "contact": contact,
-            "therapy_name": therapy_name,
-            "therapist_name": therapist_name,
-            "therapy_description": therapy_description,
-            "notes": notes,
-            "signature": signature,
-        }
+    "patient_name": patient_name,
+    "age": age,
+    "contact": contact,
+    "therapy_name": therapy_name,
+    "therapist_name": therapist_name,
+    "therapy_description": therapy_description,
+    "notes": notes,
+    "signature": signature,
+    "understood_risks": "Yes" if understood_risks else "No",
+    "voluntary": "Yes" if voluntary else "No",
+    "preferred_time": preferred_time,
+    "date": timezone.now().date(),
+}
+
         html = render_to_string("patient-portal/consent_pdf.html", context)
         pdf = pdfkit.from_string(html, False, configuration=config)
 
