@@ -3,15 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 import json
 from django.utils import timezone
-from Patient.models import PatientProfile, Appointment
+from Patient.models import PatientProfile, Appointment   # PatientProfile is your model
 from therapist.models import Therapist, Therapy
 from .services import generate_diet_plan
-from .models import Notification
-
+from .models import Notification, ConsentForm
 
 # ------------------ Dashboard ------------------
-from .models import ConsentForm
-
 @login_required
 def dashboard(request):
     patient = request.user.patientprofile
@@ -33,16 +30,13 @@ def dashboard(request):
         "history": history,
         "consents": consents,
     })
-   
+
 
 # ------------------ Appointments ------------------
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .models import Appointment
-from therapist.models import Therapist, Therapy
 @login_required
 def appointments(request):
-    patient = request.user.patientprofile
+
+    patient = request.user.patientprofile   # ⭐ FIXED: correct model
     therapies = Therapy.objects.all()
 
     if request.method == "POST":
@@ -52,36 +46,46 @@ def appointments(request):
         Appointment.objects.create(
             patient=patient,
             therapy_id=therapy_id,
-            therapist=None,   # stays empty
+            therapist=None,
             date=None,
             time=None
         )
 
         return redirect("patient-appointments")
 
-    upcoming = Appointment.objects.filter(
-        patient=patient
-    ).order_by("date")
+    upcoming = Appointment.objects.filter(patient=patient).order_by("date")
+    history = Appointment.objects.filter(patient=patient).order_by("-date")
 
-    history = Appointment.objects.filter(
-        patient=patient
-    ).order_by("-date")
+    # ⭐ NEW: pass patient health info + prakriti + allergies
+    medical = {
+        "allergies": patient.allergies,
+        "contact": patient.contact
+    }
+
+    prakriti = {
+        "type": patient.prakriti_type,
+        "description": patient.prakriti_description if hasattr(patient, "prakriti_description") else ""
+    }
 
     return render(request, "patient-portal/appointments.html", {
         "therapies": therapies,
         "upcoming": upcoming,
-        "history": history
-    })
+        "history": history,
+        "questions": PRAKRITI_QUESTIONS,
 
+
+        # ⭐ SEND TO TEMPLATE
+        "patient": patient,
+        "medical": medical,
+        "prakriti": prakriti,
+    })
 
 
 # ------------------ Profile PAGE ------------------
 @login_required
 def profile(request):
     patient = PatientProfile.objects.get(user=request.user)
-    return render(request, "patient-portal/profile.html", {
-        "patient": patient
-    })
+    return render(request, "patient-portal/profile.html", {"patient": patient})
 
 
 # ------------------ Profile UPDATE API ------------------
@@ -92,20 +96,18 @@ def update_profile(request):
 
         profile = PatientProfile.objects.get(user=request.user)
 
-        # Update User basic details
         profile.user.first_name = data.get("first_name", profile.user.first_name)
         profile.user.last_name = data.get("last_name", profile.user.last_name)
         profile.user.email = data.get("email", profile.user.email)
         profile.user.save()
 
-        # Update age safely
         age = data.get("age")
         profile.age = int(age) if age not in ["", None] else None
 
-        # Update other fields
         profile.gender = data.get("gender", profile.gender)
         profile.contact = data.get("contact", profile.contact)
         profile.allergies = data.get("allergies", profile.allergies)
+        profile.address = data.get("address", profile.address)
         profile.save()
 
         return JsonResponse({"status": "success"})
@@ -119,8 +121,10 @@ def teleconsult(request):
 def progress(request):
     return render(request, "patient-portal/progress.html")
 
+
 def diet(request):
     return render(request, "patient-portal/diet.html")
+
 
 def diet_plan_api(request):
 
@@ -260,12 +264,8 @@ PRAKRITI_QUESTIONS = [
     },
 ]
 
-
 def prakriti_test(request):
-    return render(request, "patient-portal/predict.html", {
-        "questions": PRAKRITI_QUESTIONS
-    })
-
+    return render(request, "patient-portal/predict.html", {"questions": PRAKRITI_QUESTIONS})
 
 
 def prakriti_submit(request):
@@ -316,10 +316,10 @@ def prakriti_result(request):
         "kapha": kapha,
         "dominant": dosha
     })
-    
 
+
+# ------------------ NOTIFICATIONS ------------------
 def get_notifications(request):
-    # FIXED: correct related_name
     patient = request.user.patientprofile  
 
     notes = Notification.objects.filter(patient=patient).order_by('-created_at')
@@ -342,11 +342,10 @@ def mark_all_notifications_read(request):
     Notification.objects.filter(patient=patient, is_read=False).update(is_read=True)
     return JsonResponse({"status": "ok"})
 
-import json
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from .models import PatientProfile, Notification, NotificationAPIKey
 
+# ------------------ EXTERNAL NOTIFICATION API ------------------
+from django.views.decorators.csrf import csrf_exempt
+from .models import NotificationAPIKey
 
 @csrf_exempt
 def external_notification(request):
@@ -380,17 +379,7 @@ def external_notification(request):
 
 
 
-
-   # Consent Form
-# ------------------ CONSENT FORM (One-page HTML) ------------------
-# Patient/views.py
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-import pdfkit
-from .models import ConsentForm
-from therapist.models import Therapy
-
+# ------------------ CONSENT FORM ------------------
 def consent_form_view(request):
     message = ""
     if request.method == "POST":
@@ -427,22 +416,22 @@ def consent_form_view(request):
 
         message = "Consent form submitted successfully!"
 
-        # Generate PDF
         config = pdfkit.configuration(wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+        
         context = {
-    "patient_name": patient_name,
-    "age": age,
-    "contact": contact,
-    "therapy_name": therapy_name,
-    "therapist_name": therapist_name,
-    "therapy_description": therapy_description,
-    "notes": notes,
-    "signature": signature,
-    "understood_risks": "Yes" if understood_risks else "No",
-    "voluntary": "Yes" if voluntary else "No",
-    "preferred_time": preferred_time,
-    "date": timezone.now().date(),
-}
+            "patient_name": patient_name,
+            "age": age,
+            "contact": contact,
+            "therapy_name": therapy_name,
+            "therapist_name": therapist_name,
+            "therapy_description": therapy_description,
+            "notes": notes,
+            "signature": signature,
+            "understood_risks": "Yes" if understood_risks else "No",
+            "voluntary": "Yes" if voluntary else "No",
+            "preferred_time": preferred_time,
+            "date": timezone.now().date(),
+        }
 
         html = render_to_string("patient-portal/consent_pdf.html", context)
         pdf = pdfkit.from_string(html, False, configuration=config)
@@ -450,6 +439,18 @@ def consent_form_view(request):
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="consent_form.pdf"'
         return response
-        return redirect('/dashboard/')
 
     return render(request, "patient-portal/consent_form.html", {"message": message})
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,57 +1,350 @@
 {% extends "patient-portal/base.html" %}
 {% load static %}
 
-{% block appointments %}active{% endblock appointments %}
-
-{% block title %}Appointments{% endblock title %}
+{% block appointments %}active{% endblock %}
+{% block title %}Connect Doctor{% endblock %}
 
 {% block style %}
-<!-- Fonts -->
-<link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap"
-    rel="stylesheet">
-<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
 <link rel="stylesheet" href="{% static 'css/patient-portal/appointments.css' %}">
 
-{% endblock style %}
+<style>
+
+.pd-nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.pd-tab {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--theme-gold);
+    background: #fff8e6;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.pd-tab:hover {
+    background: #ffe7b3;
+}
+
+.pd-tab.active {
+    background: var(--theme-gold);
+    color: white;
+    border-color: var(--theme-gold-dark);
+}
+
+.pd-section {
+    display: none;
+    padding: 12px;
+    background: #fffdf7;
+    border-radius: 8px;
+    line-height: 1.6;
+}
+
+.info-card-beautiful {
+    background: linear-gradient(145deg, #fff7e8, #fffdf8);
+    border-radius: 14px;
+    padding: 25px;
+    border: 1px solid #f3e2c0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+.info-item label {
+    font-weight: 700;
+    color: #5b3b1f;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.info-item label i {
+    color: var(--theme-gold);
+}
+
+.info-item input,
+.info-item textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e9dcc4;
+    border-radius: 10px;
+    background: #ffffff;
+    font-size: 1rem;
+    color: #2c2c2c;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.info-item full-width {
+    grid-column: span 2;
+}
+
+.info-item textarea {
+    height: 90px;
+}
+
+
+/* ------------ PRAKRITI UI -------------- */
+
+.prakriti-card {
+    background: linear-gradient(145deg, #fff7e8, #fffdf8);
+    border: 1px solid #f3d7a6;
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 16px rgba(160,120,30,0.10);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.prakriti-question {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #5b3b1f;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.prakriti-number {
+    background: var(--theme-gold);
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.prakriti-option {
+    background: #ffffff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #e8d6b5;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.prakriti-option:hover {
+    border-color: var(--theme-gold);
+    background: #fff4d6;
+    box-shadow: 0 0 10px rgba(200,150,20,0.15);
+}
+
+.prakriti-option input {
+    transform: scale(1.2);
+}
+
+/* -------- Colorful Submit Button -------- */
+
+.prakriti-submit-btn {
+    background: linear-gradient(135deg, #d4a019, #f7d774);
+    color: #4a3200;
+    padding: 12px 26px;
+    border-radius: 32px;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+    box-shadow: 0 4px 12px rgba(180,130,20,0.35);
+}
+
+.prakriti-submit-btn:hover {
+    background: linear-gradient(135deg, #ffcf3d, #ffeaa3);
+    box-shadow: 0 6px 16px rgba(200,150,20,0.45);
+    transform: translateY(-2px);
+}
+
+</style>
+{% endblock %}
+
 
 {% block content %}
-<!-- MAIN CONTENT -->
+
 <div class="appointments-main-container">
 
     <div class="appointments-page-header">
-        <h1 class="appointments-page-title">Appointments</h1>
+        <h1 class="appointments-page-title">Connect Doctor</h1>
     </div>
 
     <div class="appointments-grid-layout">
 
-        <!-- 1. BOOK APPOINTMENT FORM -->
+        <!-- PATIENT DETAILS CARD -->
         <div class="appointments-content-card">
+
             <div class="appointments-card-header">
-                <i class="far fa-calendar-plus" style="color:var(--theme-gold-dark)"></i> Book New Session
+                <i class="fa-solid fa-user" style="color:var(--theme-gold-dark)"></i> Patient Details
             </div>
 
-            <form method="post" action="{% url 'patient-appointments' %}">
-                {% csrf_token %}
+            <div class="pd-nav">
+                <button class="pd-tab active" onclick="showPDTab('info')">Info</button>
+                <button class="pd-tab" onclick="showPDTab('medical')">Medical Details</button>
+                <button class="pd-tab" onclick="showPDTab('prakriti')">Prakriti</button>
+            </div>
 
-                <div class="booking-form-group">
-                    <label>Select Therapy</label>
-                    <select class="booking-input-select" name="therapy" required>
-                        <option value="">-- Choose Therapy --</option>
-                        {% for t in therapies %}
-                        <option value="{{ t.id }}">{{ t.name }}</option>
-                        {% endfor %}
-                    </select>
+            <div class="pd-content">
+
+                <!-- INFO TAB -->
+                <div class="pd-section" id="pd-info" style="display:block;">
+                    <div class="info-card-beautiful">
+                        <div class="info-grid">
+
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-user-circle"></i> Full Name</label>
+                                <input type="text" value="{{ patient.user.first_name }} {{ patient.user.last_name }}" readonly>
+                            </div>
+
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-envelope"></i> Email</label>
+                                <input type="text" value="{{ patient.user.email }}" readonly>
+                            </div>
+
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-calendar"></i> Date of Birth</label>
+                                <input type="text" value="{{ patient.dob|date:'d M, Y' }}" readonly>
+                            </div>
+
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-venus-mars"></i> Gender</label>
+                                <input type="text" value="{{ patient.gender }}" readonly>
+                            </div>
+
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-phone"></i> Contact Number</label>
+                                <input type="text" value="{{ patient.contact }}" readonly>
+                            </div>
+
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-person"></i> Age</label>
+                                <input type="text" value="{{ patient.age }}" readonly>
+                            </div>
+
+                            <div class="info-item full-width">
+                                <label><i class="fa-solid fa-location-dot"></i> Address</label>
+                                <textarea readonly>{{ patient.address }}</textarea>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
 
-                <button class="booking-submit-btn" type="submit">Request Appointment</button>
-            </form>
+                <!-- MEDICAL DETAILS TAB -->
+                <div class="pd-section" id="pd-medical">
+                    {% if medical %}
+                    <div class="info-card-beautiful">
+                        <div class="info-grid">
 
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-weight-scale"></i> Weight (kg)</label>
+                                <input type="text" value="{{ medical.weight }}">
+                            </div>
+
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-droplet"></i> Blood Group</label>
+                                <input type="text" value="{{ medical.blood_group }}">
+                            </div>
+
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-heart-circle-bolt"></i> BP - Systolic</label>
+                                <input type="text" value="{{ medical.bp_systolic }}">
+                            </div>
+
+                            <div class="info-item">
+                                <label><i class="fa-solid fa-heart-pulse"></i> BP - Diastolic</label>
+                                <input type="text" value="{{ medical.bp_diastolic }}">
+                            </div>
+
+                            <div class="info-item full-width">
+                                <label><i class="fa-solid fa-virus-covid"></i> Pre-Existing Diseases</label>
+                                <textarea>{{ medical.pre_diseases }}</textarea>
+                            </div>
+
+                        </div>
+                    </div>
+                    {% else %}
+                        <p>No medical details added yet.</p>
+                    {% endif %}
+                </div>
+
+                <!-- PRAKRITI TAB -->
+                <div class="pd-section" id="pd-prakriti">
+
+                    <div id="prakriti-tab-content" class="tab-content">
+
+                        <!-- ⭐⭐⭐ THIS IS YOUR WORKING PRAKRITI FORM ⭐⭐⭐ -->
+                        <form method="POST" action="{% url 'prakriti_submit' %}">
+                            {% csrf_token %}
+
+                            {% for q in questions %}
+                            <div class="prakriti-card">
+
+                                <div class="prakriti-question">
+                                    <div class="prakriti-number">{{ forloop.counter }}</div>
+                                    {{ q.question }}
+                                </div>
+
+                                <label class="prakriti-option">
+                                    <input type="radio" name="q{{ forloop.counter }}" value="vata" required>
+                                    {{ q.vata }}
+                                </label>
+
+                                <label class="prakriti-option">
+                                    <input type="radio" name="q{{ forloop.counter }}" value="pitta">
+                                    {{ q.pitta }}
+                                </label>
+
+                                <label class="prakriti-option">
+                                    <input type="radio" name="q{{ forloop.counter }}" value="kapha">
+                                    {{ q.kapha }}
+                                </label>
+
+                            </div>
+                            {% endfor %}
+
+                            <button class="prakriti-submit-btn mt-3" type="submit">
+                                <i class="fas fa-check-circle"></i> Submit Prakriti Test
+                            </button>
+
+                        </form>
+                        <!-- ⭐⭐⭐ END WORKING PRAKRITI FORM ⭐⭐⭐ -->
+
+                    </div>
+
+                </div>
+
+            </div>
         </div>
 
-        <!-- 2. UPCOMING -->
+
+        <!-- UPCOMING SESSIONS -->
         <div class="appointments-content-card">
             <div class="appointments-card-header">
                 <i class="fas fa-hourglass-half" style="color:var(--theme-gold-dark)"></i> Upcoming Sessions
@@ -67,19 +360,22 @@
                             <span><i class="far fa-calendar"></i> {{ appt.date }}</span>
                             <span><i class="far fa-clock"></i> {{ appt.time }}</span>
                         </div>
-                        <div style="font-size:0.8rem; color:var(--theme-muted);">{{ appt.therapist.name }}</div>
+                        <div style="font-size:0.8rem; color:var(--theme-muted);">
+                            {{ appt.therapist.name }}
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
                 {% else %}
-                <p style="text-align:center; color:#999;">No upcoming appointments.</p>
+                    <p style="text-align:center; color:#999;">No upcoming appointments.</p>
                 {% endif %}
             </div>
         </div>
 
     </div>
 
-    <!-- HISTORY (Optional) -->
+
+    <!-- HISTORY -->
     <div class="appointments-content-card">
         <div class="appointments-card-header">
             <i class="fas fa-history" style="color:var(--theme-gold-dark)"></i> Past Appointment History
@@ -88,13 +384,14 @@
         <div class="history-table-wrapper">
             <table class="history-table">
                 <thead>
-                    <tr>
-                        <th>Therapy</th>
-                        <th>Date</th>
-                        <th>Therapist</th>
-                        <th>Status</th>
-                    </tr>
+                <tr>
+                    <th>Therapy</th>
+                    <th>Date</th>
+                    <th>Therapist</th>
+                    <th>Status</th>
+                </tr>
                 </thead>
+
                 <tbody id="history-list">
                     <tr>
                         <td colspan="4" style="text-align:center; color:#aaa;">No records available</td>
@@ -107,31 +404,13 @@
 </div>
 
 
-<!-- SLOT GENERATOR -->
 <script>
-    function fetchSlots() {
-        const date = document.getElementById('input-date').value;
-        const container = document.getElementById('slots-container');
-
-        if (!date) return;
-
-        container.innerHTML = "";
-        const mockTimes = ["09:00 AM", "10:30 AM", "01:00 PM", "03:30 PM", "05:00 PM"];
-
-        mockTimes.forEach(time => {
-            const div = document.createElement('div');
-            div.className = 'booking-time-slot';
-            div.textContent = time;
-
-            div.onclick = () => {
-                document.querySelectorAll('.booking-time-slot').forEach(el => el.classList.remove('selected'));
-                div.classList.add('selected');
-                document.getElementById('input-time').value = time;
-            };
-
-            container.appendChild(div);
-        });
-    }
+function showPDTab(tab) {
+    document.querySelectorAll(".pd-tab").forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".pd-section").forEach(section => section.style.display = "none");
+    document.querySelector(`button[onclick="showPDTab('${tab}')"]`).classList.add("active");
+    document.getElementById(`pd-${tab}`).style.display = "block";
+}
 </script>
 
-{% endblock content %}
+{% endblock %}
