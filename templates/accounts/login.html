@@ -36,23 +36,38 @@
                 <button id="signupTab">Sign Up</button>
             </div>
 
-            <!-- LOGIN FORM -->
-            <form id="loginForm" class="form" method="POST" action="{% url 'login' %}">
-                {% csrf_token %}
+    <!-- LOGIN FORM -->
+<form id="loginForm" class="form" method="POST" action="{% url 'login' %}">
+    {% csrf_token %}
 
-                <label>Email Address</label>
-                <input name="email" id="login_email" type="email" placeholder="your@email.com" required>
+    <label>Email Address</label>
+    <input name="identifier" id="login_identifier" type="email" placeholder="your@email.com" required>
 
-                <label>Password</label>
-                <input name="password" id="login_password" type="password" placeholder="••••••••" required>
+    <button type="button" class="main-btn" id="sendOtpBtn" style="margin-top: 10px;">Send OTP</button>
 
-                <div class="help-recover">
-                    <span class="for-pass"><a href="forgetpass.html">Forgot Password?</a></span>
-                    <span class="is-therapist"><a href="{% url 'therapist-login' %}">Login as Therapist →</a></span>
-                </div>
+   <div id="otpSection" style="display:none; margin-top: 15px;">
+    <label>Enter OTP</label>
+    <input name="otp" id="login_otp" type="text" placeholder="123456" required>
 
-                <button type="submit" class="main-btn">Login to Portal</button>
-            </form>
+    <button type="submit" class="main-btn" style="margin-top: 10px;">Verify & Login</button>
+</div>
+
+<p id="countdownText" style="display:none; text-align:center; margin-top:10px; color:#7b4a2d; font-weight:600;">
+    Resend OTP in <span id="timer">30</span>s
+</p>
+
+<button type="button" id="resendOtpBtn" class="main-btn" style="display:none; margin-top:10px;">
+    Resend OTP
+</button>
+
+
+
+    <div class="help-recover" style="margin-top: 20px;">
+        <span class="for-pass"><a href="forgetpass.html">Forgot Password?</a></span>
+        <span class="is-therapist"><a href="{% url 'therapist-login' %}">Login as Therapist →</a></span>
+    </div>
+</form>
+
 
 
 
@@ -181,6 +196,96 @@
             }
         }
     </script>
+    <script>
+    
+
+
+let timerInterval;
+
+function startCountdown() {
+    let timeLeft = 30;
+    document.getElementById("timer").innerText = timeLeft;
+    document.getElementById("countdownText").style.display = "block";
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").innerText = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById("countdownText").style.display = "none";
+            document.getElementById("resendOtpBtn").style.display = "block";  // show resend button
+        }
+    }, 1000);
+}
+
+
+// ---- SEND OTP ----
+document.getElementById("sendOtpBtn").addEventListener("click", function () {
+    let email = document.getElementById("login_identifier").value;
+
+    if (email.trim() === "") {
+        alert("Please enter Email");
+        return;
+    }
+
+    fetch("{% url 'send-otp' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "sent") {
+
+            document.getElementById("sendOtpBtn").style.display = "none";
+            document.getElementById("otpSection").style.display = "block";
+
+            // hide resend button if visible
+            document.getElementById("resendOtpBtn").style.display = "none";
+
+            startCountdown(); // ⏳ start 30 sec timer
+
+            alert("OTP sent successfully!");
+        } else {
+            alert(data.message);
+        }
+    });
+});
+
+
+// ---- RESEND OTP ----
+document.getElementById("resendOtpBtn").addEventListener("click", function () {
+    let email = document.getElementById("login_identifier").value;
+
+    fetch("{% url 'send-otp' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "sent") {
+
+            document.getElementById("resendOtpBtn").style.display = "none"; // hide resend
+            startCountdown(); // restart 30 sec timer
+
+            alert("OTP resent successfully!");
+        }
+    });
+});
+
+
+</script>
+
+
+
 
 
 </body>

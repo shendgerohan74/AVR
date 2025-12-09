@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'therapist',
     'progress',
     'billing',
-    'chat',
+   
     # 'aiassistant',
     
 
@@ -156,3 +156,11 @@ RAZORPAY_KEY_SECRET = "4zIMu206f42cKE1IZ5HVddvT"
 # Optional: for Stripe
 # STRIPE_SECRET_KEY = "sk_test_xxx"
 # STRIPE_PUBLISHABLE_KEY = "pk_test_yyy"
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "gaikwad.a.a.28@gmail.com"
+EMAIL_HOST_PASSWORD = "tidb oxml rsbe itvo"

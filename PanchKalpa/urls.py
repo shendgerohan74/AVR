@@ -35,6 +35,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from accounts import views
 from accounts.views import landing_page   # ONLY THIS
 from Patient.views import consent_form_view
 
@@ -49,7 +50,6 @@ urlpatterns = [
 
     # Therapist App
     path('therapist/', include('therapist.urls')),
-    path('chat/', include('chat.urls')),
 
     # Patient App
     path('patient/', include('Patient.urls')),
@@ -58,6 +58,8 @@ urlpatterns = [
     
     # path("ai-assistant/", include("ai-assistant.urls")),
     path("consent/", consent_form_view, name="consent_form"),
+    path("send-otp/", views.send_otp, name="send-otp"),
+    path("login/", views.otp_login, name="login"),
 
 
 ]
